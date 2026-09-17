@@ -15,11 +15,11 @@ body{background:var(--bg);color:var(--ink);font-family:-apple-system,"Pretendard
 .logo{width:52px;height:52px;border-radius:16px;background:#fff;overflow:hidden;padding:3px;border:2px solid #E3D9BE;}
 .logo img{width:100%;height:100%;object-fit:contain;display:block;border-radius:12px;background:#fff;}display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px;border:2px solid var(--ink);flex-shrink:0;user-select:none;cursor:pointer}
 .brand1{font-size:44px !important;font-weight:900 !important;letter-spacing:-1px;font-family:'Pretendard Black','Noto Sans KR Black','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#191F28;-webkit-text-stroke:0.9px #191F28;paint-order:stroke fill;text-shadow:0 0 0 #191F28,1px 0 0 #191F28,-1px 0 0 #191F28,0 1px 0 #191F28,0 -1px 0 #191F28,1px 1px 0 #191F28,-1px -1px 0 #191F28,1px -1px 0 #191F28,-1px 1px 0 #191F28};letter-spacing:-.3px}
-.brand2{font-size:13.5px;color:#5B543F;font-weight:600}
+.brand2{font-size:17px;color:#3A3524;font-weight:800;letter-spacing:-.3px}
 .bell{margin-left:auto;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.65);border:1.5px solid rgba(25,31,40,.25);font-size:22px;cursor:pointer;position:relative}
 .bell .dot{position:absolute;top:9px;right:11px;width:11px;height:11px;border-radius:50%;background:#E5484D;border:2px solid #fff;display:none}
-.hero-hi{margin-top:16px;font-size:28px;font-weight:800;letter-spacing:-.5px;line-height:1.35}
-.hero-hi small{display:block;font-size:16px;font-weight:600;color:#5B543F;margin-top:4px}
+.hero-hi{margin-top:16px;font-size:30px;font-weight:900;letter-spacing:-.5px;line-height:1.35;color:#191F28}
+.hero-hi small{display:block;font-size:18px;font-weight:800;color:#3A3524;margin-top:6px}
 .hero-ill{position:absolute;right:6px;bottom:2px;opacity:1;pointer-events:none}
 /* 겹치는 흰 카드 */
 .sheet{margin:-38px 16px 0;background:var(--card);border-radius:24px;border:1px solid var(--line);box-shadow:0 6px 20px rgba(25,31,40,.07);padding:22px 20px}
@@ -438,7 +438,7 @@ function carProgress(){if(simP!==null)return simP;return [0.06,0.18,0.06,0.38,0.
 var GACHI_LOGO="";
 var IMG_HOME="";
 var IMG_TOGETHER="";
-/* 폴백 약도: 인터넷이 막혀도 절대 흰 화면이 안 나오게 */
+/* 폴백 약도: 오프라인 환경에서는도 절대 흰 화면이 안 나오게 */
 function routeXY(p){p=Math.max(0,Math.min(1,p));return [24+p*552, 190-p*140];}
 function fallbackSVG(progress, label){
   var c=routeXY(progress), h=routeXY(0), e=routeXY(1);
@@ -467,7 +467,7 @@ function updateFallbackCars(){
     var el=document.getElementById(id); if(!el||!el.querySelector(".fbwrap")) return;
     var note=el.querySelector(".mapnote"); var ntxt=note?note.textContent:"";
     el.innerHTML=fallbackSVG(carProgress(), "이동 경로 약도")
-      +'<button class="retrybtn" data-retry="'+id+'">↻ 실제지도로 다시 시도</button>'
+      +'<button class="retrybtn" data-retry="'+id+'">위치 확인용 약도</button>'
       +'<div class="mapnote">'+ntxt+'</div>';
     Array.prototype.forEach.call(el.querySelectorAll("[data-retry]"), function(b){
       b.onclick=function(ev){ev.stopPropagation(); loadLeafletThenInit(true);};
