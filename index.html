@@ -345,7 +345,7 @@ var D=["진료 등록을 기다리고 있어요","환자 상태를 분석하고 
 var PMS=["차량 준비","차량 도착","이동 중","병원 도착","진료 완료","귀가"];
 function toast(m){var e=document.getElementById("toast");e.textContent=m;e.style.display="block";clearTimeout(e._t);e._t=setTimeout(function(){e.style.display="none"},2200)}
 function tabFromHash(){var h=location.hash.replace("#/","");if(["home","move","guardian","alerts","my","feedback"].indexOf(h)>=0)return h;return "home"}
-function setTab(t){S.tab=t;try{history.replaceState(null,"","#/"+t)}catch(e){location.hash="/"+t}render();try{bindRealBtns();}catch(e){}try{loadLeafletThenInit(false);}catch(e){}try{refreshMapSize();}catch(e){}setTimeout(function(){try{bindRealBtns();}catch(e){}try{refreshMapSize();}catch(e){}},500);}
+function setTab(t){S.tab=t;try{history.replaceState(null,"","#/"+t)}catch(e){location.hash="/"+t}render();try{bindRealBtns();}catch(e){}try{loadLeafletThenInit(false);}catch(e){}try{refreshMapSize();}catch(e){}setTimeout(function(){try{bindRealBtns();}catch(e){}try{refreshMapSize();}catch(e){}},500);setTimeout(function(){try{refreshMapSize();}catch(e){}try{forceDaejeon(map1);}catch(e){}try{forceDaejeon(map2);}catch(e){}},1300);}
 function render(){var views={home:document.getElementById("view-home"),move:document.getElementById("view-move"),guardian:document.getElementById("view-guardian"),alerts:document.getElementById("view-alerts"),my:document.getElementById("view-my"),feedback:document.getElementById("view-feedback")};Object.keys(views).forEach(function(v){views[v].classList.toggle("show",S.tab===v)});
  document.querySelectorAll(".navbtn").forEach(function(b){b.classList.toggle("on",b.dataset.tab===S.tab)});
  document.getElementById("bellDot").style.display=S.unread>0?"block":"none";
@@ -497,17 +497,17 @@ function ensureLeaflet(cb){
 function carEmojiIcon(bg){return L.divIcon({className:"",html:'<div style="position:relative;width:58px;height:58px;border-radius:50%;background:'+bg+';border:3px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.22)"><svg viewBox="0 0 48 30" width="36" height="23" aria-label="휠체어 환자와 보호자 동행"><g stroke="#5B4A00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="7" r="4.6" fill="#fff"/><path d="M7 13 L18 13 L17 20 L8 20 Z" fill="#fff"/><circle cx="9" cy="22" r="5.5" fill="none"/><circle cx="22" cy="24" r="2.4" fill="none"/><circle cx="35" cy="6.5" r="4.6" fill="#fff"/><path d="M29 13 L41 13 L40 26 M34 16 L34 26" fill="none"/></g></svg><div style="position:absolute;right:-6px;bottom:-4px;min-width:34px;height:20px;padding:0 6px;border-radius:11px;background:#191F28;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;">동행중</div></div>',iconSize:[58,58],iconAnchor:[29,29]});}
 function homeIcon(){return L.divIcon({className:"",html:'<div style="width:38px;height:38px;border-radius:50%;background:#FFC531;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)">\uD83C\uDFE0</div>',iconSize:[38,38],iconAnchor:[19,19]});}
 function hospIcon(){return L.divIcon({className:"",html:'<div style="width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid #FFC531;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)">\uD83C\uDFE5</div>',iconSize:[38,38],iconAnchor:[19,19]});}
-var TILE_URLS=["https://tile.openstreetmap.org/{z}/{x}/{y}.png","https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png","https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"];var TILE_ATTR=["© OpenStreetMap","© OpenStreetMap · HOT","© OpenStreetMap · © CARTO"];var TILE_SUB=[undefined,"abc",["a","b","c","d"]];var ERROR_TILE="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#F3EEDF"/><g stroke="#E3D9BE" stroke-width="1"><path d="M0 64H256M0 128H256M0 192H256M64 0V256M128 0V256M192 0V256"/></g></svg>');
+var TILE_URLS=["https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}","https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png","https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"];var TILE_ATTR=["\u00A9 Esri \u00B7 OpenStreetMap contributors","\u00A9 OpenStreetMap contributors","\u00A9 OpenStreetMap \u00B7 HOT"];var TILE_SUB=[undefined,["a","b","c"],["a","b"]];var ERROR_TILE="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#F3EEDF"/><g stroke="#E3D9BE" stroke-width="1"><path d="M0 64H256M0 128H256M0 192H256M64 0V256M128 0V256M192 0V256"/></g></svg>');
 function addTileFallback(map,id){var idx=0;
- var mk=function(i){return L.tileLayer(TILE_URLS[i],{maxZoom:19,attribution:TILE_ATTR[i],subdomains:TILE_SUB[i]||"abc",errorTileUrl:ERROR_TILE});};
+ var mk=function(i){var o={maxZoom:19,attribution:TILE_ATTR[i],errorTileUrl:ERROR_TILE};if(TILE_SUB[i]){o.subdomains=TILE_SUB[i];}return L.tileLayer(TILE_URLS[i],o);};
  var layer=mk(idx).addTo(map);var err=0;
+ var onOk=function(){err=0;};
  var onErr=function(){err++;
-  if(err>=2&&idx<TILE_URLS.length-1){try{map.removeLayer(layer);}catch(e){}idx++;err=0;
-   try{layer=mk(idx).addTo(map); layer.on("tileerror",onErr);}catch(e){}}
-  else if(err===2){showTileWarn(id);}};
- layer.on("tileerror",onErr);
- // 타일 img 자체에 에러 핸들러를 직접 걸어 Access blocked 회색 이미지를 베이지 타일로 교체
- try{setTimeout(function(){var box=document.getElementById(id);if(!box)return;var imgs=box.querySelectorAll("img.leaflet-tile");for(var k=0;k<imgs.length;k++){(function(im){im.referrerPolicy="no-referrer";im.onerror=function(){try{im.src=ERROR_TILE;}catch(e){}};})(imgs[k]);}},2500);}catch(e){}
+  if(err>=6&&idx<TILE_URLS.length-1){try{map.removeLayer(layer);}catch(e){}idx++;err=0;
+   try{layer=mk(idx).addTo(map); layer.on("tileerror",onErr); layer.on("tileload",onOk);}catch(e){}}
+  else if(err===6){showTileWarn(id);}};
+ layer.on("tileerror",onErr); layer.on("tileload",onOk);
+ try{var coverFn=function(){var box=document.getElementById(id);if(!box)return;var imgs=box.querySelectorAll("img.leaflet-tile");for(var k=0;k<imgs.length;k++){(function(im){try{im.referrerPolicy="no-referrer";}catch(e){} if(!im._cov){im._cov=1;im.onerror=function(){try{im.src=ERROR_TILE;}catch(e){}};}}})(imgs[k]);}}; setTimeout(coverFn,1200); setTimeout(coverFn,4000);}catch(e){}
  return layer;}
 function buildRealMaps(){
   try{
@@ -515,7 +515,7 @@ function buildRealMaps(){
     carMk1=carMk2=gpsMk1=gpsMk2=null; gpsFixed=false;
     var t1=document.getElementById("realMap"), t2=document.getElementById("realMapG");
     if(t1)t1.innerHTML=""; if(t2)t2.innerHTML="";
-    map1=L.map("realMap",{scrollWheelZoom:false}).setView([36.328,127.400],12);
+    map1=L.map("realMap",{scrollWheelZoom:false,minZoom:7,maxZoom:19,maxBounds:[[32.5,123.5],[39.5,132.5]],maxBoundsViscosity:1.0,worldCopyJump:false}).setView([36.328,127.400],14);
     var tl1=addTileFallback(map1,"realMap");
     tl1.on("tileerror", function(){ showTileWarn("realMap"); });
     L.marker(HOME_LL,{icon:homeIcon()}).addTo(map1).bindPopup("집 · 둔산동 (가상 출발지)");
@@ -524,7 +524,7 @@ function buildRealMaps(){
     carMk1=L.marker(routePos(carProgress()),{icon:carEmojiIcon("#FFC531")}).addTo(map1).bindPopup("휠체어 전용 차량 · 동행중 🤝");
     map1.fitBounds(L.latLngBounds(ROUTE_LL),{padding:[18,18]});
     if(S.tab==="move"){ setTimeout(function(){try{map1.invalidateSize();}catch(e){}},200); }
-    map2=L.map("realMapG",{scrollWheelZoom:false}).setView([36.328,127.400],12);
+    map2=L.map("realMapG",{scrollWheelZoom:false,minZoom:7,maxZoom:19,maxBounds:[[32.5,123.5],[39.5,132.5]],maxBoundsViscosity:1.0,worldCopyJump:false}).setView([36.328,127.400],14);
     var tl2=addTileFallback(map2,"realMapG");
     tl2.on("tileerror", function(){ showTileWarn("realMapG"); });
     L.marker(HOME_LL,{icon:homeIcon()}).addTo(map2).bindPopup("집");
@@ -533,7 +533,7 @@ function buildRealMaps(){
     carMk2=L.marker(routePos(carProgress()),{icon:carEmojiIcon("#2E9E63")}).addTo(map2).bindPopup("김○○님 탑승 차량");
     map2.fitBounds(L.latLngBounds(ROUTE_LL),{padding:[18,18]});
     if(S.tab==="guardian"){ setTimeout(function(){try{map2.invalidateSize();}catch(e){}},200); }
-    mapsReady=true; updateCarOnMaps();
+    mapsReady=true; updateCarOnMaps();setTimeout(function(){try{refreshMapSize();}catch(e){}},600);setTimeout(function(){try{refreshMapSize();}catch(e){}},1400);
     setTimeout(checkTilesLoaded, 12000);
   }catch(e){ mapsReady=false; showFallback("realMap","위치 확인용 약도로 이동을 확인하세요."); showFallback("realMapG","위치 확인용 약도로 이동을 확인하세요."); }
 }
@@ -581,7 +581,7 @@ function loadLeafletThenInit(force){
 }
 function initMaps(){ loadLeafletThenInit(false); }
 function updateCarOnMaps(){var ll=routePos(carProgress());if(carMk1)carMk1.setLatLng(ll);if(carMk2)carMk2.setLatLng(ll);updateFallbackCars();}
-function refreshMapSize(){try{if(map1&&S.tab==="move")map1.invalidateSize();if(map2&&S.tab==="guardian")map2.invalidateSize();}catch(e){}}
+function daejeonBounds(){try{return L.latLngBounds(ROUTE_LL);}catch(e){return null;}} function forceDaejeon(m){try{if(!m||typeof L==="undefined")return;var b=daejeonBounds();if(!b)return;var c=null;try{c=m.getCenter();}catch(e){}if(!c||Math.abs(c.lat-36.328)>0.5||Math.abs(c.lng-127.400)>0.5){try{m.setView([36.328,127.400],14,{animate:false});}catch(e){}try{m.fitBounds(b,{padding:[18,18],animate:false});}catch(e){}}}catch(e){}} function refreshMapSize(){try{if(map1&&S.tab==="move"){map1.invalidateSize();try{map1.fitBounds(daejeonBounds(),{padding:[18,18]});}catch(e){forceDaejeon(map1);}}if(map2&&S.tab==="guardian"){map2.invalidateSize();try{map2.fitBounds(daejeonBounds(),{padding:[18,18]});}catch(e){forceDaejeon(map2);}}}catch(e){}}
 function startGps(){
  if(!navigator.geolocation){toast("이 기기에서 GPS를 쓸 수 없어요");return;}
  if(!(window.isSecureContext||location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
