@@ -170,6 +170,7 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
         <div class="mapbtns">
           <button id="btnGps1" class="go">📍 내 위치 보기 (GPS)</button>
           <button id="btnReal1" class="line">🗺 실제지도로 보기</button>
+          <button id="btnSim1" class="line">🚐 실시간 이동 시작</button>
           
         </div>
         <p class="small" id="mapLabel" style="padding:6px 6px 0">현재 상태: 차량이 준비되었어요</p>
@@ -199,6 +200,7 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
         <div class="mapbtns">
           <button id="btnGps2" class="go">📍 내 위치 보기 (GPS)</button>
           <button id="btnReal2" class="line">🗺 실제지도로 보기</button>
+          <button id="btnSim2" class="line">🚐 실시간 이동 시작</button>
           
         </div>
         <p class="small" id="gMapLabel">차량이 곧 출발합니다.</p>
@@ -408,6 +410,8 @@ document.getElementById("btnGoFb").onclick=function(){setTab("feedback")};
 document.getElementById("btnGoFb2").onclick=function(){setTab("feedback")};
 document.getElementById("btnGps1").onclick=startGps;
 document.getElementById("btnGps2").onclick=startGps;
+try{document.getElementById("btnSim1").onclick=startSim;}catch(e){}
+try{document.getElementById("btnSim2").onclick=startSim;}catch(e){}
 
 
 var _setTab=setTab;setTab=function(t){_setTab(t);setTimeout(refreshMapSize,150);};
@@ -507,7 +511,7 @@ function addTileFallback(map,id){var idx=0;
    try{layer=mk(idx).addTo(map); layer.on("tileerror",onErr); layer.on("tileload",onOk);}catch(e){}}
   else if(err===6){showTileWarn(id);}};
  layer.on("tileerror",onErr); layer.on("tileload",onOk);
- try{var coverFn=function(){var box=document.getElementById(id);if(!box)return;var imgs=box.querySelectorAll("img.leaflet-tile");for(var k=0;k<imgs.length;k++){(function(im){try{im.referrerPolicy="no-referrer";}catch(e){} if(!im._cov){im._cov=1;im.onerror=function(){try{im.src=ERROR_TILE;}catch(e){}};}}})(imgs[k]);}}; setTimeout(coverFn,1200); setTimeout(coverFn,4000);}catch(e){}
+ try{var coverFn=function(){var box=document.getElementById(id);if(!box)return;var imgs=box.querySelectorAll("img.leaflet-tile");for(var k=0;k<imgs.length;k++){(function(im){try{im.referrerPolicy="no-referrer";}catch(e){} if(!im._cov){im._cov=1;im.onerror=function(){try{im.src=ERROR_TILE;}catch(e){}};}}})(imgs[k]);}; setTimeout(coverFn,1200); setTimeout(coverFn,4000);}catch(e){}
  return layer;}
 function buildRealMaps(){
   try{
@@ -581,6 +585,10 @@ function loadLeafletThenInit(force){
 }
 function initMaps(){ loadLeafletThenInit(false); }
 function updateCarOnMaps(){var ll=routePos(carProgress());if(carMk1)carMk1.setLatLng(ll);if(carMk2)carMk2.setLatLng(ll);updateFallbackCars();}
+function updateSimUI(done){var pct=Math.round(carProgress()*100);var m1=document.getElementById("mapLabel");var m2=document.getElementById("gMapLabel");var run=simTimer!==null;var t=run?("이동 중 · 약 "+pct+"% · 지도에서 차량(♿)이 움직입니다"):((done||carProgress()>=1)?"병원에 도착했어요 · 이동 완료":(simP!==null?("일시정지 중 · 약 "+pct+"%"):"현재 상태: 차량이 준비되었어요"));if(m1)m1.textContent=t;if(m2)m2.textContent=t;var b1=document.getElementById("btnSim1");if(b1)b1.textContent=run?"⏸ 실시간 이동 정지":"🚐 실시간 이동 시작";var b2=document.getElementById("btnSim2");if(b2)b2.textContent=run?"⏸ 실시간 이동 정지":"🚐 실시간 이동 시작";}
+function stepSim(){if(simP===null)simP=0.06;simP+=0.03;if(simP>=1){simP=1;try{updateCarOnMaps();}catch(e){}try{updateSimUI(true);}catch(e){}try{stopSim(true);}catch(e){}toast("병원에 도착했어요");return;}try{updateCarOnMaps();}catch(e){}try{updateSimUI(false);}catch(e){}}
+function startSim(){if(simTimer!==null){stopSim(false);return;}if(simP!==null&&simP>=1)simP=0;if(simP===null)simP=0.06;simTimer=setInterval(stepSim,1000);try{updateSimUI(false);}catch(e){}toast("실시간 이동을 시작합니다. 차량(♿)이 1초마다 움직여요");}
+function stopSim(done){if(simTimer!==null){try{clearInterval(simTimer);}catch(e){}simTimer=null;}try{updateSimUI(done);}catch(e){}if(!done)toast("실시간 이동을 멈췄어요");}
 function daejeonBounds(){try{return L.latLngBounds(ROUTE_LL);}catch(e){return null;}} function forceDaejeon(m){try{if(!m||typeof L==="undefined")return;var b=daejeonBounds();if(!b)return;var c=null;try{c=m.getCenter();}catch(e){}if(!c||Math.abs(c.lat-36.328)>0.5||Math.abs(c.lng-127.400)>0.5){try{m.setView([36.328,127.400],14,{animate:false});}catch(e){}try{m.fitBounds(b,{padding:[18,18],animate:false});}catch(e){}}}catch(e){}} function refreshMapSize(){try{if(map1&&S.tab==="move"){map1.invalidateSize();try{map1.fitBounds(daejeonBounds(),{padding:[18,18]});}catch(e){forceDaejeon(map1);}}if(map2&&S.tab==="guardian"){map2.invalidateSize();try{map2.fitBounds(daejeonBounds(),{padding:[18,18]});}catch(e){forceDaejeon(map2);}}}catch(e){}}
 function startGps(){
  if(!navigator.geolocation){toast("이 기기에서 GPS를 쓸 수 없어요");return;}
@@ -608,6 +616,8 @@ function bindRealBtns(){
   var b2=document.getElementById("btnReal2"); if(b2&&!b2._bd){b2._bd=1;b2.onclick=function(){toast("실제지도를 불러오는 중입니다…");loadLeafletThenInit(true);setTimeout(function(){try{refreshMapSize();}catch(e){}},600);};}
   var g1=document.getElementById("btnGps1"); if(g1&&!g1._bd){g1._bd=1;g1.onclick=function(){startGps();};}
   var g2=document.getElementById("btnGps2"); if(g2&&!g2._bd){g2._bd=1;g2.onclick=function(){startGps();};}
+  var s1=document.getElementById("btnSim1"); if(s1&&!s1._bd){s1._bd=1;s1.onclick=function(){startSim();};}
+  var s2=document.getElementById("btnSim2"); if(s2&&!s2._bd){s2._bd=1;s2.onclick=function(){startSim();};}
 }
 function syncSimBtns(t){try{bindRealBtns();}catch(e){}}
 </script>
