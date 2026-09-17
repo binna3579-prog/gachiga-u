@@ -495,9 +495,9 @@ function ensureLeaflet(cb){
 function carEmojiIcon(bg){return L.divIcon({className:"",html:'<div style="position:relative;width:58px;height:58px;border-radius:50%;background:'+bg+';border:3px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.22)"><svg viewBox="0 0 48 30" width="36" height="23" aria-label="휠체어 환자와 보호자 동행"><g stroke="#5B4A00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="7" r="4.6" fill="#fff"/><path d="M7 13 L18 13 L17 20 L8 20 Z" fill="#fff"/><circle cx="9" cy="22" r="5.5" fill="none"/><circle cx="22" cy="24" r="2.4" fill="none"/><circle cx="35" cy="6.5" r="4.6" fill="#fff"/><path d="M29 13 L41 13 L40 26 M34 16 L34 26" fill="none"/></g></svg><div style="position:absolute;right:-6px;bottom:-4px;min-width:34px;height:20px;padding:0 6px;border-radius:11px;background:#191F28;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;">동행중</div></div>',iconSize:[58,58],iconAnchor:[29,29]});}
 function homeIcon(){return L.divIcon({className:"",html:'<div style="width:38px;height:38px;border-radius:50%;background:#FFC531;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)">\uD83C\uDFE0</div>',iconSize:[38,38],iconAnchor:[19,19]});}
 function hospIcon(){return L.divIcon({className:"",html:'<div style="width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid #FFC531;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)">\uD83C\uDFE5</div>',iconSize:[38,38],iconAnchor:[19,19]});}
-var TILE_URLS=["https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png","https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}","https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png","https://tile.openstreetmap.org/{z}/{x}/{y}.png"];var TILE_ATTR=["© OpenStreetMap · © CARTO","© Esri · © OpenStreetMap","© OpenStreetMap · HOT","© OpenStreetMap"];var TILE_SUB=[["a","b","c","d"],undefined,undefined,"abc"];
+var TILE_URLS=["https://tile.openstreetmap.org/{z}/{x}/{y}.png","https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png","https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png","https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"];var TILE_ATTR=["© OpenStreetMap","© OpenStreetMap · © CARTO","© OpenStreetMap · HOT","© Esri · © OpenStreetMap"];var TILE_SUB=["abc",["a","b","c","d"],"abc",undefined];var ERROR_TILE="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#F3EEDF"/><g stroke="#E3D9BE" stroke-width="1"><path d="M0 64H256M0 128H256M0 192H256M64 0V256M128 0V256M192 0V256"/></g></svg>');
 function addTileFallback(map,id){var idx=0;
- var mk=function(i){return L.tileLayer(TILE_URLS[i],{maxZoom:19,attribution:TILE_ATTR[i],subdomains:TILE_SUB[i]||"abc"});};
+ var mk=function(i){return L.tileLayer(TILE_URLS[i],{maxZoom:19,attribution:TILE_ATTR[i],subdomains:TILE_SUB[i]||"abc",errorTileUrl:ERROR_TILE,crossOrigin:true});};
  var layer=mk(idx).addTo(map);var err=0;
  var onErr=function(){err++;
   if(err>=3&&idx<TILE_URLS.length-1){try{map.removeLayer(layer);}catch(e){}idx++;err=0;
@@ -530,7 +530,7 @@ function buildRealMaps(){
     map2.fitBounds(L.latLngBounds(ROUTE_LL),{padding:[18,18]});
     if(S.tab==="guardian"){ setTimeout(function(){try{map2.invalidateSize();}catch(e){}},200); }
     mapsReady=true; updateCarOnMaps();
-    setTimeout(checkTilesLoaded, 6000);
+    setTimeout(checkTilesLoaded, 12000);
   }catch(e){ mapsReady=false; showFallback("realMap","위치 확인용 약도로 이동을 확인하세요."); showFallback("realMapG","위치 확인용 약도로 이동을 확인하세요."); }
 }
 function showTileWarn(id){
@@ -543,10 +543,7 @@ function checkTilesLoaded(){
   try{
     var n=document.querySelectorAll("#realMap img.leaflet-tile-loaded, #realMapG img.leaflet-tile-loaded").length;
     if(n===0 && mapsReady){
-      try{ if(map1){map1.remove();map1=null;} if(map2){map2.remove();map2=null;} }catch(e){}
-      mapsReady=false; carMk1=carMk2=null;
-      showFallbackWithRetry("realMap","타일 로딩이 차단된 환경입니다. 위치 확인용 약도로 경로를 확인하세요.");
-      showFallbackWithRetry("realMapG","위치 확인용 약도입니다.");
+      showTileWarn("realMap"); showTileWarn("realMapG");
     }
   }catch(e){}
 }
