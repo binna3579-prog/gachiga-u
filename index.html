@@ -169,6 +169,7 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
         <div id="realMap" class="rmap" role="img" aria-label="실시간 지도: 집에서 충남대학교병원까지 이동 경로"></div>
         <div class="mapbtns">
           <button id="btnGps1" class="go">📍 내 위치 보기 (GPS)</button>
+          <button id="btnReal1" class="line">🗺 실제지도로 보기</button>
           
         </div>
         <p class="small" id="mapLabel" style="padding:6px 6px 0">현재 상태: 차량이 준비되었어요</p>
@@ -197,6 +198,7 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
         <div id="realMapG" class="rmap small" role="img" aria-label="보호자용 실시간 지도"></div>
         <div class="mapbtns">
           <button id="btnGps2" class="go">📍 내 위치 보기 (GPS)</button>
+          <button id="btnReal2" class="line">🗺 실제지도로 보기</button>
           
         </div>
         <p class="small" id="gMapLabel">차량이 곧 출발합니다.</p>
@@ -467,7 +469,7 @@ function updateFallbackCars(){
     var el=document.getElementById(id); if(!el||!el.querySelector(".fbwrap")) return;
     var note=el.querySelector(".mapnote"); var ntxt=note?note.textContent:"";
     el.innerHTML=fallbackSVG(carProgress(), "이동 경로 약도")
-      +'<button class="retrybtn" data-retry="'+id+'">위치 확인용 약도</button>'
+      +'<button class="retrybtn" data-retry="'+id+'">↻ 실제지도로 다시 시도</button>'
       +'<div class="mapnote">'+ntxt+'</div>';
     Array.prototype.forEach.call(el.querySelectorAll("[data-retry]"), function(b){
       b.onclick=function(ev){ev.stopPropagation(); loadLeafletThenInit(true);};
@@ -495,15 +497,17 @@ function ensureLeaflet(cb){
 function carEmojiIcon(bg){return L.divIcon({className:"",html:'<div style="position:relative;width:58px;height:58px;border-radius:50%;background:'+bg+';border:3px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.22)"><svg viewBox="0 0 48 30" width="36" height="23" aria-label="휠체어 환자와 보호자 동행"><g stroke="#5B4A00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="7" r="4.6" fill="#fff"/><path d="M7 13 L18 13 L17 20 L8 20 Z" fill="#fff"/><circle cx="9" cy="22" r="5.5" fill="none"/><circle cx="22" cy="24" r="2.4" fill="none"/><circle cx="35" cy="6.5" r="4.6" fill="#fff"/><path d="M29 13 L41 13 L40 26 M34 16 L34 26" fill="none"/></g></svg><div style="position:absolute;right:-6px;bottom:-4px;min-width:34px;height:20px;padding:0 6px;border-radius:11px;background:#191F28;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;">동행중</div></div>',iconSize:[58,58],iconAnchor:[29,29]});}
 function homeIcon(){return L.divIcon({className:"",html:'<div style="width:38px;height:38px;border-radius:50%;background:#FFC531;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)">\uD83C\uDFE0</div>',iconSize:[38,38],iconAnchor:[19,19]});}
 function hospIcon(){return L.divIcon({className:"",html:'<div style="width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid #FFC531;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)">\uD83C\uDFE5</div>',iconSize:[38,38],iconAnchor:[19,19]});}
-var TILE_URLS=["https://tile.openstreetmap.org/{z}/{x}/{y}.png","https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png","https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png","https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"];var TILE_ATTR=["© OpenStreetMap","© OpenStreetMap · © CARTO","© OpenStreetMap · HOT","© Esri · © OpenStreetMap"];var TILE_SUB=["abc",["a","b","c","d"],"abc",undefined];var ERROR_TILE="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#F3EEDF"/><g stroke="#E3D9BE" stroke-width="1"><path d="M0 64H256M0 128H256M0 192H256M64 0V256M128 0V256M192 0V256"/></g></svg>');
+var TILE_URLS=["https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png","https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png","https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"];var TILE_ATTR=["© OpenStreetMap · HOT","© OpenStreetMap · © CARTO","© Esri · © OpenStreetMap"];var TILE_SUB=["abc",["a","b","c","d"],undefined];var ERROR_TILE="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#F3EEDF"/><g stroke="#E3D9BE" stroke-width="1"><path d="M0 64H256M0 128H256M0 192H256M64 0V256M128 0V256M192 0V256"/></g></svg>');
 function addTileFallback(map,id){var idx=0;
- var mk=function(i){return L.tileLayer(TILE_URLS[i],{maxZoom:19,attribution:TILE_ATTR[i],subdomains:TILE_SUB[i]||"abc",errorTileUrl:ERROR_TILE,crossOrigin:true});};
+ var mk=function(i){return L.tileLayer(TILE_URLS[i],{maxZoom:19,attribution:TILE_ATTR[i],subdomains:TILE_SUB[i]||"abc",errorTileUrl:ERROR_TILE});};
  var layer=mk(idx).addTo(map);var err=0;
  var onErr=function(){err++;
-  if(err>=3&&idx<TILE_URLS.length-1){try{map.removeLayer(layer);}catch(e){}idx++;err=0;
+  if(err>=2&&idx<TILE_URLS.length-1){try{map.removeLayer(layer);}catch(e){}idx++;err=0;
    try{layer=mk(idx).addTo(map); layer.on("tileerror",onErr);}catch(e){}}
-  else if(err===3){showTileWarn(id);}};
+  else if(err===2){showTileWarn(id);}};
  layer.on("tileerror",onErr);
+ // 타일 img 자체에 에러 핸들러를 직접 걸어 Access blocked 회색 이미지를 베이지 타일로 교체
+ try{setTimeout(function(){var box=document.getElementById(id);if(!box)return;var imgs=box.querySelectorAll("img.leaflet-tile");for(var k=0;k<imgs.length;k++){(function(im){im.referrerPolicy="no-referrer";im.onerror=function(){try{im.src=ERROR_TILE;}catch(e){}};})(imgs[k]);}},2500);}catch(e){}
  return layer;}
 function buildRealMaps(){
   try{
@@ -558,19 +562,24 @@ function showFallbackWithRetry(id, note){
 }
 var _showFallback = showFallback;
 function loadLeafletThenInit(force){
+  // 1) 항상 먼저 위치 확인용 약도를 깔아 흰 화면·차단 화면을 방지
+  if(!mapsReady||force){
+    try{showFallback("realMap","위치 확인용 약도입니다. 집에서 병원까지 이동 경로를 확인하세요.");}catch(e){}
+    try{showFallback("realMapG","위치 확인용 약도입니다.");}catch(e){}
+  }
   if(typeof L!=="undefined" && mapsReady && !force){ try{refreshMapSize();}catch(e){} return; }
   if(typeof L!=="undefined" && !mapsReady){
     try{ buildRealMaps(); return; }catch(e){}
   }
-  showFallback("realMap","\uC2E4\uC81C\uC9C0\uB3C4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\uC785\uB2C8\uB2E4...");
-  showFallback("realMapG","\uC2E4\uC81C\uC9C0\uB3C4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\uC785\uB2C8\uB2E4...");
+  // 2) 백그라운드에서 실제 지도 라이브러리 로드 (실패해도 약도 유지)
   ensureLeaflet(function(ok){
     if(ok){
       try{ buildRealMaps(); }
-      catch(e){ showFallbackWithRetry("realMap","\uC704\uCE58 \uD655\uC778\uC6A9 \uC57D\uB3C4\uC785\uB2C8\uB2E4. \uC9D1\uC5D0\uC11C \uBCD1\uC6D0\uAE4C\uC9C0 \uC774\uB3D9 \uACBD\uB85C\uB97C \uD655\uC778\uD558\uC138\uC694."); showFallbackWithRetry("realMapG","\uC704\uCE58 \uD655\uC778\uC6A9 \uC57D\uB3C4\uC785\uB2C8\uB2E4."); }
+      catch(e){ /* 약도 유지 */ }
     } else {
-      showFallbackWithRetry("realMap","\uC624\uD504\uB77C\uC778 \uD658\uACBD\uC5D0\uC11C\uB294 \uC704\uCE58 \uD655\uC778\uC6A9 \uC57D\uB3C4\uB85C \uBCF4\uC5EC\uB4DC\uB9BD\uB2C8\uB2E4. \uC778\uD130\uB137\uC774 \uB418\uBA74 \uC2E4\uC81C\uC9C0\uB3C4\uB85C \uC790\uB3D9 \uC804\uD658\uB429\uB2C8\uB2E4.");
-      showFallbackWithRetry("realMapG","\uC704\uCE58 \uD655\uC778\uC6A9 \uC57D\uB3C4\uC785\uB2C8\uB2E4.");
+      /* 오프라인/차단 환경: 약도 유지, 에러처럼 보이지 않게 조용한 안내만 */
+      try{showFallbackWithRetry("realMap","위치 확인용 약도입니다. 인터넷이 되면 실제지도로 자동 전환됩니다.");}catch(e){}
+      try{showFallbackWithRetry("realMapG","위치 확인용 약도입니다.");}catch(e){}
     }
   });
 }
@@ -598,7 +607,13 @@ function startGps(){
   } else { toast("내 위치를 확인했어요. 실제지도에서는 파란 점으로 표시됩니다"); }
  },function(err){toast("위치를 가져오지 못했어요. 약도에서 경로를 확인하세요");gpsWatch=null;},{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
 }
-function syncSimBtns(t){}
+function bindRealBtns(){
+  var b1=document.getElementById("btnReal1"); if(b1&&!b1._bd){b1._bd=1;b1.onclick=function(){toast("실제지도를 불러오는 중입니다…");loadLeafletThenInit(true);setTimeout(function(){try{refreshMapSize();}catch(e){}},600);};}
+  var b2=document.getElementById("btnReal2"); if(b2&&!b2._bd){b2._bd=1;b2.onclick=function(){toast("실제지도를 불러오는 중입니다…");loadLeafletThenInit(true);setTimeout(function(){try{refreshMapSize();}catch(e){}},600);};}
+  var g1=document.getElementById("btnGps1"); if(g1&&!g1._bd){g1._bd=1;g1.onclick=function(){startGps();};}
+  var g2=document.getElementById("btnGps2"); if(g2&&!g2._bd){g2._bd=1;g2.onclick=function(){startGps();};}
+}
+function syncSimBtns(t){try{bindRealBtns();}catch(e){}}
 </script>
 
 <!--ethos-badge--><div style="text-align:center;padding:16px 8px 20px;font:12px/1.6 -apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#9aa1a9">이 페이지는 <a href="https://ethos.ai.kr" target="_blank" rel="noopener" style="color:#8a919b;text-decoration:underline">에토스AI 코드</a>로 만들어졌습니다</div>
