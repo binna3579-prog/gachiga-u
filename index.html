@@ -14,7 +14,7 @@ body{background:var(--bg);color:var(--ink);font-family:-apple-system,"Pretendard
 .hero-top{display:flex;align-items:center;gap:10px}
 .logo{width:52px;height:52px;border-radius:16px;background:#fff;overflow:hidden;padding:3px;border:2px solid #E3D9BE;}
 .logo img{width:100%;height:100%;object-fit:contain;display:block;border-radius:12px;background:#fff;}display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px;border:2px solid var(--ink);flex-shrink:0;user-select:none;cursor:pointer}
-.brand1{font-size:26px;font-weight:900;letter-spacing:-0.5px;text-shadow:0 1px 0 currentColor};letter-spacing:-.3px}
+.brand1{font-size:30px;font-weight:900;letter-spacing:-0.8px;text-shadow:0 1px 0 currentColor,0 0 1px currentColor};letter-spacing:-.3px}
 .brand2{font-size:13.5px;color:#5B543F;font-weight:600}
 .bell{margin-left:auto;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.65);border:1.5px solid rgba(25,31,40,.25);font-size:22px;cursor:pointer;position:relative}
 .bell .dot{position:absolute;top:9px;right:11px;width:11px;height:11px;border-radius:50%;background:#E5484D;border:2px solid #fff;display:none}
@@ -169,7 +169,7 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
         <div id="realMap" class="rmap" role="img" aria-label="실시간 지도: 집에서 충남대학교병원까지 이동 경로"></div>
         <div class="mapbtns">
           <button id="btnGps1" class="go">📍 내 위치 보기 (GPS)</button>
-          <button id="btnSim1">▶ 차량 이동 시연</button>
+          
         </div>
         <p class="small" id="mapLabel" style="padding:6px 6px 0">현재 상태: 차량이 준비되었어요</p>
         <p class="gpsstat" id="gpsStat1">GPS를 누르면 내 현재 위치(파란 점)가 지도에 표시됩니다 · 위치는 이 기기에서만 사용됩니다</p>
@@ -197,7 +197,7 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
         <div id="realMapG" class="rmap small" role="img" aria-label="보호자용 실시간 지도"></div>
         <div class="mapbtns">
           <button id="btnGps2" class="go">📍 내 위치 보기 (GPS)</button>
-          <button id="btnSim2">▶ 차량 이동 시연</button>
+          
         </div>
         <p class="small" id="gMapLabel">차량이 곧 출발합니다.</p>
         <p class="gpsstat" id="gpsStat2">같은 차량 위치가 보호자 지도에도 함께 표시됩니다</p>
@@ -343,7 +343,7 @@ var D=["진료 등록을 기다리고 있어요","환자 상태를 분석하고 
 var PMS=["차량 준비","차량 도착","이동 중","병원 도착","진료 완료","귀가"];
 function toast(m){var e=document.getElementById("toast");e.textContent=m;e.style.display="block";clearTimeout(e._t);e._t=setTimeout(function(){e.style.display="none"},2200)}
 function tabFromHash(){var h=location.hash.replace("#/","");if(["home","move","guardian","alerts","my","feedback"].indexOf(h)>=0)return h;return "home"}
-function setTab(t){S.tab=t;try{history.replaceState(null,"","#/"+t)}catch(e){location.hash="/"+t}render()}
+function setTab(t){S.tab=t;try{history.replaceState(null,"","#/"+t)}catch(e){location.hash="/"+t}render();try{loadLeafletThenInit(false);}catch(e){}try{refreshMapSize();}catch(e){}}
 function render(){var views={home:document.getElementById("view-home"),move:document.getElementById("view-move"),guardian:document.getElementById("view-guardian"),alerts:document.getElementById("view-alerts"),my:document.getElementById("view-my"),feedback:document.getElementById("view-feedback")};Object.keys(views).forEach(function(v){views[v].classList.toggle("show",S.tab===v)});
  document.querySelectorAll(".navbtn").forEach(function(b){b.classList.toggle("on",b.dataset.tab===S.tab)});
  document.getElementById("bellDot").style.display=S.unread>0?"block":"none";
@@ -406,8 +406,8 @@ document.getElementById("btnGoFb").onclick=function(){setTab("feedback")};
 document.getElementById("btnGoFb2").onclick=function(){setTab("feedback")};
 document.getElementById("btnGps1").onclick=startGps;
 document.getElementById("btnGps2").onclick=startGps;
-document.getElementById("btnSim1").onclick=startSim;
-document.getElementById("btnSim2").onclick=startSim;
+
+
 var _setTab=setTab;setTab=function(t){_setTab(t);setTimeout(refreshMapSize,150);};
 document.getElementById("btnCall").onclick=function(){toast("기사 김○○님께 연결합니다 (시제품)")};
 document.getElementById("btnMgr").onclick=function(){toast("동행 매니저 이○○님을 불렀어요")};
@@ -425,7 +425,7 @@ function loadFb(){try{return JSON.parse(localStorage.getItem("gachiga_fb")||"[]"
 function renderFb(){var a=loadFb();document.getElementById("fbCount").textContent=a.length;var w=document.getElementById("fbList");if(!w)return;if(!a.length){w.innerHTML='<p class="muted">아직 의견이 없습니다.</p>';return}w.innerHTML="";a.slice().reverse().forEach(function(f){var d=document.createElement("div");d.className="kv";d.innerHTML="<b>"+f.mood+"</b> · "+(f.cat||"기타")+"<br>"+f.text+"<br><span class='small'>"+f.at+"</span>";w.appendChild(d)})}
 document.getElementById("btnFb").onclick=function(){var t=document.getElementById("fbText").value.trim();if(!S.fb){toast("위에서 좋아요·보통이에요·불편해요 중 하나를 골라주세요");return}if(!t){toast("의견을 한 줄이라도 적어주세요");return}var a=loadFb();a.push({mood:S.fb,cat:document.getElementById("fbCat").value.trim()||"기타",text:t.replace(/</g,"&lt;"),at:new Date().toLocaleString("ko-KR")});localStorage.setItem("gachiga_fb",JSON.stringify(a));document.getElementById("fbText").value="";renderFb();toast("의견을 보내주셔서 감사합니다")};
 window.addEventListener("hashchange",function(){if(location.hash==="#/admin"){openPin();return}var t=tabFromHash();if(t!==S.tab){S.tab=t;render()}});
-(function(){if(location.hash==="#/admin"){openPin()}var t=tabFromHash();S.tab=t;render();renderPatients();syncDetail();renderFb()})();
+(function(){if(location.hash==="#/admin"){openPin()}var t=tabFromHash();S.tab=t;render();renderPatients();syncDetail();renderFb();try{initMaps();}catch(e){}})();
 
 /* ===== 진짜 지도 (Leaflet + OpenStreetMap) + 차단환경 폴백 약도 + GPS ===== */
 var HOME_LL=[36.3510,127.3780];
@@ -561,7 +561,7 @@ function refreshMapSize(){try{if(map1&&S.tab==="move")map1.invalidateSize();if(m
 function startGps(){
  if(!navigator.geolocation){toast("이 기기에서 GPS를 쓸 수 없어요");return;}
  if(!(window.isSecureContext||location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
-   toast("GPS는 게시된 주소(https)에서 위치 허용을 눌러야 동작해요. 지금은 차량 시연으로 보세요");
+   toast("GPS는 게시된 주소(https)에서 위치 허용을 눌러야 동작해요. 지금은 약도에서 경로를 확인하세요");
  }
  toast("GPS로 내 위치를 찾고 있어요…");
  if(gpsWatch!==null){toast("이미 내 위치를 보고 있어요");return;}
@@ -577,7 +577,7 @@ function startGps(){
    else if(gpsMk2)gpsMk2.setLatLng(ll);
    if(!gpsFixed&&map1){map1.setView(ll,14);gpsFixed=true;}
   } else { toast("내 위치를 확인했어요. 실제지도에서는 파란 점으로 표시됩니다"); }
- },function(err){toast("위치를 가져오지 못했어요. 시연 모드로 보세요");gpsWatch=null;},{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
+ },function(err){toast("위치를 가져오지 못했어요. 약도에서 경로를 확인하세요");gpsWatch=null;},{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
 }
 function startSim(){
  if(simTimer){clearInterval(simTimer);simTimer=null;simP=null;updateCarOnMaps();toast("시연을 멈췄어요");syncSimBtns("▶ 차량 이동 시연");return;}
