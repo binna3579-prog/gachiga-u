@@ -345,7 +345,7 @@ var D=["진료 등록을 기다리고 있어요","환자 상태를 분석하고 
 var PMS=["차량 준비","차량 도착","이동 중","병원 도착","진료 완료","귀가"];
 function toast(m){var e=document.getElementById("toast");e.textContent=m;e.style.display="block";clearTimeout(e._t);e._t=setTimeout(function(){e.style.display="none"},2200)}
 function tabFromHash(){var h=location.hash.replace("#/","");if(["home","move","guardian","alerts","my","feedback"].indexOf(h)>=0)return h;return "home"}
-function setTab(t){S.tab=t;try{history.replaceState(null,"","#/"+t)}catch(e){location.hash="/"+t}render();try{loadLeafletThenInit(false);}catch(e){}try{refreshMapSize();}catch(e){}}
+function setTab(t){S.tab=t;try{history.replaceState(null,"","#/"+t)}catch(e){location.hash="/"+t}render();try{bindRealBtns();}catch(e){}try{loadLeafletThenInit(false);}catch(e){}try{refreshMapSize();}catch(e){}setTimeout(function(){try{bindRealBtns();}catch(e){}try{refreshMapSize();}catch(e){}},500);}
 function render(){var views={home:document.getElementById("view-home"),move:document.getElementById("view-move"),guardian:document.getElementById("view-guardian"),alerts:document.getElementById("view-alerts"),my:document.getElementById("view-my"),feedback:document.getElementById("view-feedback")};Object.keys(views).forEach(function(v){views[v].classList.toggle("show",S.tab===v)});
  document.querySelectorAll(".navbtn").forEach(function(b){b.classList.toggle("on",b.dataset.tab===S.tab)});
  document.getElementById("bellDot").style.display=S.unread>0?"block":"none";
@@ -427,7 +427,7 @@ function loadFb(){try{return JSON.parse(localStorage.getItem("gachiga_fb")||"[]"
 function renderFb(){var a=loadFb();document.getElementById("fbCount").textContent=a.length;var w=document.getElementById("fbList");if(!w)return;if(!a.length){w.innerHTML='<p class="muted">아직 의견이 없습니다.</p>';return}w.innerHTML="";a.slice().reverse().forEach(function(f){var d=document.createElement("div");d.className="kv";d.innerHTML="<b>"+f.mood+"</b> · "+(f.cat||"기타")+"<br>"+f.text+"<br><span class='small'>"+f.at+"</span>";w.appendChild(d)})}
 document.getElementById("btnFb").onclick=function(){var t=document.getElementById("fbText").value.trim();if(!S.fb){toast("위에서 좋아요·보통이에요·불편해요 중 하나를 골라주세요");return}if(!t){toast("의견을 한 줄이라도 적어주세요");return}var a=loadFb();a.push({mood:S.fb,cat:document.getElementById("fbCat").value.trim()||"기타",text:t.replace(/</g,"&lt;"),at:new Date().toLocaleString("ko-KR")});localStorage.setItem("gachiga_fb",JSON.stringify(a));document.getElementById("fbText").value="";renderFb();toast("의견을 보내주셔서 감사합니다")};
 window.addEventListener("hashchange",function(){if(location.hash==="#/admin"){openPin();return}var t=tabFromHash();if(t!==S.tab){S.tab=t;render()}});
-(function(){if(location.hash==="#/admin"){openPin()}var t=tabFromHash();S.tab=t;render();renderPatients();syncDetail();renderFb();try{initMaps();}catch(e){}})();
+(function(){if(location.hash==="#/admin"){openPin()}var t=tabFromHash();S.tab=t;render();renderPatients();syncDetail();renderFb();try{initMaps();}catch(e){}try{bindRealBtns();}catch(e){}})();
 
 /* ===== 진짜 지도 (Leaflet + OpenStreetMap) + 차단환경 폴백 약도 + GPS ===== */
 var HOME_LL=[36.3510,127.3780];
@@ -497,7 +497,7 @@ function ensureLeaflet(cb){
 function carEmojiIcon(bg){return L.divIcon({className:"",html:'<div style="position:relative;width:58px;height:58px;border-radius:50%;background:'+bg+';border:3px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.22)"><svg viewBox="0 0 48 30" width="36" height="23" aria-label="휠체어 환자와 보호자 동행"><g stroke="#5B4A00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="7" r="4.6" fill="#fff"/><path d="M7 13 L18 13 L17 20 L8 20 Z" fill="#fff"/><circle cx="9" cy="22" r="5.5" fill="none"/><circle cx="22" cy="24" r="2.4" fill="none"/><circle cx="35" cy="6.5" r="4.6" fill="#fff"/><path d="M29 13 L41 13 L40 26 M34 16 L34 26" fill="none"/></g></svg><div style="position:absolute;right:-6px;bottom:-4px;min-width:34px;height:20px;padding:0 6px;border-radius:11px;background:#191F28;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;">동행중</div></div>',iconSize:[58,58],iconAnchor:[29,29]});}
 function homeIcon(){return L.divIcon({className:"",html:'<div style="width:38px;height:38px;border-radius:50%;background:#FFC531;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)">\uD83C\uDFE0</div>',iconSize:[38,38],iconAnchor:[19,19]});}
 function hospIcon(){return L.divIcon({className:"",html:'<div style="width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid #FFC531;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)">\uD83C\uDFE5</div>',iconSize:[38,38],iconAnchor:[19,19]});}
-var TILE_URLS=["https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png","https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png","https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"];var TILE_ATTR=["© OpenStreetMap · HOT","© OpenStreetMap · © CARTO","© Esri · © OpenStreetMap"];var TILE_SUB=["abc",["a","b","c","d"],undefined];var ERROR_TILE="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#F3EEDF"/><g stroke="#E3D9BE" stroke-width="1"><path d="M0 64H256M0 128H256M0 192H256M64 0V256M128 0V256M192 0V256"/></g></svg>');
+var TILE_URLS=["https://tile.openstreetmap.org/{z}/{x}/{y}.png","https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png","https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"];var TILE_ATTR=["© OpenStreetMap","© OpenStreetMap · HOT","© OpenStreetMap · © CARTO"];var TILE_SUB=[undefined,"abc",["a","b","c","d"]];var ERROR_TILE="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#F3EEDF"/><g stroke="#E3D9BE" stroke-width="1"><path d="M0 64H256M0 128H256M0 192H256M64 0V256M128 0V256M192 0V256"/></g></svg>');
 function addTileFallback(map,id){var idx=0;
  var mk=function(i){return L.tileLayer(TILE_URLS[i],{maxZoom:19,attribution:TILE_ATTR[i],subdomains:TILE_SUB[i]||"abc",errorTileUrl:ERROR_TILE});};
  var layer=mk(idx).addTo(map);var err=0;
@@ -561,23 +561,19 @@ function showFallbackWithRetry(id, note){
   });
 }
 var _showFallback = showFallback;
+function showMapLoading(id){var el=document.getElementById(id);if(!el)return;if(el.querySelector(".leaflet-container"))return;el.innerHTML='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#F3EEDF;color:#5B4A00;font-weight:800;font-size:15px"><div>🗺 실제지도를 불러오는 중입니다…</div><div style="font-size:13px;font-weight:700;color:#8A7A3A">잠시만 기다려주세요</div></div>';}
 function loadLeafletThenInit(force){
-  // 1) 항상 먼저 위치 확인용 약도를 깔아 흰 화면·차단 화면을 방지
-  if(!mapsReady||force){
-    try{showFallback("realMap","위치 확인용 약도입니다. 집에서 병원까지 이동 경로를 확인하세요.");}catch(e){}
-    try{showFallback("realMapG","위치 확인용 약도입니다.");}catch(e){}
-  }
-  if(typeof L!=="undefined" && mapsReady && !force){ try{refreshMapSize();}catch(e){} return; }
+  if(typeof L!=="undefined" && mapsReady && !force){ try{refreshMapSize();bindRealBtns();}catch(e){} return; }
   if(typeof L!=="undefined" && !mapsReady){
-    try{ buildRealMaps(); return; }catch(e){}
+    try{ buildRealMaps(); try{bindRealBtns();}catch(e){} return; }catch(e){}
   }
-  // 2) 백그라운드에서 실제 지도 라이브러리 로드 (실패해도 약도 유지)
+  if(!mapsReady){ try{showMapLoading("realMap");}catch(e){} try{showMapLoading("realMapG");}catch(e){} }
+  else if(force){ try{showMapLoading("realMap");}catch(e){} try{showMapLoading("realMapG");}catch(e){} }
   ensureLeaflet(function(ok){
     if(ok){
-      try{ buildRealMaps(); }
-      catch(e){ /* 약도 유지 */ }
+      try{ buildRealMaps(); try{bindRealBtns();}catch(e){} }
+      catch(e){ try{showFallbackWithRetry("realMap","위치 확인용 약도입니다. 인터넷이 되면 실제지도로 자동 전환됩니다.");}catch(e2){} }
     } else {
-      /* 오프라인/차단 환경: 약도 유지, 에러처럼 보이지 않게 조용한 안내만 */
       try{showFallbackWithRetry("realMap","위치 확인용 약도입니다. 인터넷이 되면 실제지도로 자동 전환됩니다.");}catch(e){}
       try{showFallbackWithRetry("realMapG","위치 확인용 약도입니다.");}catch(e){}
     }
