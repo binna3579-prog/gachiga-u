@@ -499,11 +499,11 @@ var TILE_URLS=["https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
 function addTileFallback(map,id){var idx=0;
  var mk=function(i){return L.tileLayer(TILE_URLS[i],{maxZoom:19,attribution:TILE_ATTR[i],subdomains:TILE_SUB[i]||"abc"});};
  var layer=mk(idx).addTo(map);var err=0;
- layer.on("tileerror",function(){err++;
+ var onErr=function(){err++;
   if(err>=3&&idx<TILE_URLS.length-1){try{map.removeLayer(layer);}catch(e){}idx++;err=0;
-   try{layer=mk(idx).addTo(map);
-   layer.on("tileerror",arguments.callee);}catch(e){}}
-  else if(err===3){showTileWarn(id);}});
+   try{layer=mk(idx).addTo(map); layer.on("tileerror",onErr);}catch(e){}}
+  else if(err===3){showTileWarn(id);}};
+ layer.on("tileerror",onErr);
  return layer;}
 function buildRealMaps(){
   try{
@@ -543,17 +543,39 @@ function checkTilesLoaded(){
   try{
     var n=document.querySelectorAll("#realMap img.leaflet-tile-loaded, #realMapG img.leaflet-tile-loaded").length;
     if(n===0 && mapsReady){
-      showFallback("realMap","위치 확인용 약도입니다. 집에서 병원까지 이동 경로를 확인하세요.");
       try{ if(map1){map1.remove();map1=null;} if(map2){map2.remove();map2=null;} }catch(e){}
       mapsReady=false; carMk1=carMk2=null;
-      showFallback("realMapG","위치 확인용 약도입니다.");
+      showFallbackWithRetry("realMap","타일 로딩이 차단된 환경입니다. 위치 확인용 약도로 경로를 확인하세요.");
+      showFallbackWithRetry("realMapG","위치 확인용 약도입니다.");
     }
   }catch(e){}
 }
+function showFallbackWithRetry(id, note){
+  var el=document.getElementById(id); if(!el) return;
+  el.innerHTML=fallbackSVG(carProgress(), id==="realMap"?"집에서 병원까지 이동 경로 약도":"보호자용 이동 경로 약도")
+    +'<button class="retrybtn" data-retry="'+id+'">\u21BB 실제지도로 다시 시도</button>'
+    +'<div class="mapnote">'+note+'</div>';
+  Array.prototype.forEach.call(el.querySelectorAll("[data-retry]"), function(b){
+    b.onclick=function(ev){ev.stopPropagation(); loadLeafletThenInit(true);};
+  });
+}
+var _showFallback = showFallback;
 function loadLeafletThenInit(force){
-  mapsReady=false;
-  showFallback("realMap","위치 확인용 약도입니다. 집에서 병원까지 이동 경로를 확인하세요.");
-  showFallback("realMapG","위치 확인용 약도입니다.");
+  if(typeof L!=="undefined" && mapsReady && !force){ try{refreshMapSize();}catch(e){} return; }
+  if(typeof L!=="undefined" && !mapsReady){
+    try{ buildRealMaps(); return; }catch(e){}
+  }
+  showFallback("realMap","\uC2E4\uC81C\uC9C0\uB3C4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\uC785\uB2C8\uB2E4...");
+  showFallback("realMapG","\uC2E4\uC81C\uC9C0\uB3C4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\uC785\uB2C8\uB2E4...");
+  ensureLeaflet(function(ok){
+    if(ok){
+      try{ buildRealMaps(); }
+      catch(e){ showFallbackWithRetry("realMap","\uC704\uCE58 \uD655\uC778\uC6A9 \uC57D\uB3C4\uC785\uB2C8\uB2E4. \uC9D1\uC5D0\uC11C \uBCD1\uC6D0\uAE4C\uC9C0 \uC774\uB3D9 \uACBD\uB85C\uB97C \uD655\uC778\uD558\uC138\uC694."); showFallbackWithRetry("realMapG","\uC704\uCE58 \uD655\uC778\uC6A9 \uC57D\uB3C4\uC785\uB2C8\uB2E4."); }
+    } else {
+      showFallbackWithRetry("realMap","\uC624\uD504\uB77C\uC778 \uD658\uACBD\uC5D0\uC11C\uB294 \uC704\uCE58 \uD655\uC778\uC6A9 \uC57D\uB3C4\uB85C \uBCF4\uC5EC\uB4DC\uB9BD\uB2C8\uB2E4. \uC778\uD130\uB137\uC774 \uB418\uBA74 \uC2E4\uC81C\uC9C0\uB3C4\uB85C \uC790\uB3D9 \uC804\uD658\uB429\uB2C8\uB2E4.");
+      showFallbackWithRetry("realMapG","\uC704\uCE58 \uD655\uC778\uC6A9 \uC57D\uB3C4\uC785\uB2C8\uB2E4.");
+    }
+  });
 }
 function initMaps(){ loadLeafletThenInit(false); }
 function updateCarOnMaps(){var ll=routePos(carProgress());if(carMk1)carMk1.setLatLng(ll);if(carMk2)carMk2.setLatLng(ll);updateFallbackCars();}
