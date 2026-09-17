@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>가치가U - 같이 가요</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--y:#F2D56E;--y-deep:#DFAF2B;--y-soft:#FFF6D9;--y-line:#EDDC9A;--ink:#191F28;--sub:#8B95A1;--bg:#F5F4EF;--card:#fff;--line:#EFEAE0;--ok:#2E9E63;--ok-soft:#E6F6EC;--blue:#4A7FD4}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,"Pretendard","Noto Sans KR","Apple SD Gothic Neo",sans-serif;font-size:18px;line-height:1.62}
+.wrap{max-width:720px;margin:0 auto;padding-bottom:130px}
+/* 상단 노랑 헤더 */
+.hero{background:var(--y);border-radius:0 0 30px 30px;padding:16px 20px 56px;position:relative;overflow:hidden}
+.hero-top{display:flex;align-items:center;gap:10px}
+.logo{width:46px;height:46px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px;border:2px solid var(--ink);flex-shrink:0;user-select:none;cursor:pointer}
+.brand1{font-size:20px;font-weight:800;letter-spacing:-.3px}
+.brand2{font-size:13.5px;color:#5B543F;font-weight:600}
+.bell{margin-left:auto;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.65);border:1.5px solid rgba(25,31,40,.25);font-size:22px;cursor:pointer;position:relative}
+.bell .dot{position:absolute;top:9px;right:11px;width:11px;height:11px;border-radius:50%;background:#E5484D;border:2px solid #fff;display:none}
+.hero-hi{margin-top:16px;font-size:28px;font-weight:800;letter-spacing:-.5px;line-height:1.35}
+.hero-hi small{display:block;font-size:16px;font-weight:600;color:#5B543F;margin-top:4px}
+.hero-ill{position:absolute;right:6px;bottom:2px;opacity:.95;pointer-events:none}
+/* 겹치는 흰 카드 */
+.sheet{margin:-38px 16px 0;background:var(--card);border-radius:24px;border:1px solid var(--line);box-shadow:0 6px 20px rgba(25,31,40,.07);padding:22px 20px}
+.card{background:var(--card);border-radius:22px;padding:22px 20px;border:1px solid var(--line);box-shadow:0 4px 14px rgba(25,31,40,.05);margin:12px 16px}
+.card h2{font-size:25px;letter-spacing:-.5px;margin-bottom:4px}
+.card h3{font-size:21px;letter-spacing:-.3px;margin-bottom:8px}
+.muted{color:var(--sub);font-size:15.5px}
+.row{display:flex;gap:10px;align-items:center}
+.bigbtn{display:block;width:100%;border:0;border-radius:18px;padding:18px;font-size:20px;font-weight:800;cursor:pointer;min-height:60px}
+.btn-y{background:var(--ink);color:#fff}
+.btn-soft{background:var(--y-soft);color:var(--ink);border:1.5px solid var(--y-line)}
+.btn-line{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.seg{background:#EFF1F3;border-radius:14px;padding:4px;display:flex;gap:4px;margin:14px 0}
+.seg button{flex:1;border:0;background:transparent;border-radius:10px;padding:12px 4px;font-size:17px;font-weight:700;color:var(--sub);cursor:pointer;min-height:52px}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(25,31,40,.10)}
+.kv{background:#FAFAF8;border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin:8px 0;font-size:17px}
+.kv b{font-size:18px}
+.pill{display:inline-block;font-size:14px;font-weight:800;border-radius:999px;padding:4px 12px;background:var(--y-soft);border:1px solid var(--y-line)}
+.pill.ok{background:var(--ok-soft);border-color:#BFE3CC;color:#20663A}
+.pill.move{background:#E8F0FE;border-color:#C4D8F7;color:#2B5BA6}
+.steps{margin:12px 0}
+.step{display:flex;gap:12px;align-items:flex-start;padding:9px 2px;font-size:18px}
+.ck{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;border:2px solid #D8D3C8;background:#fff;color:#B9B2A4}
+.step.done .ck{background:var(--ok);border-color:var(--ok);color:#fff}
+.step.now .ck{background:var(--y);border-color:var(--ink);color:var(--ink)}
+.step.now{font-weight:800}
+.map{background:#FDFBF4;border:1.5px solid var(--line);border-radius:18px;padding:8px;margin:12px 0}
+.view{display:none}
+.view.show{display:block}
+/* 하단 내비 */
+.bottom{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);z-index:40}
+.bottom-in{max-width:720px;margin:0 auto;display:flex}
+.navbtn{flex:1;border:0;background:none;padding:10px 2px 14px;font-size:13px;color:var(--sub);cursor:pointer;font-weight:700}
+.navbtn .ic{font-size:24px;display:block;line-height:1.2}
+.navbtn.on{color:var(--ink)}
+/* 자동 연결 흐름 */
+.auto{display:none;background:#FFFDF0;border:1.5px solid var(--y-line);border-radius:18px;padding:16px;margin:12px 0}
+.auto.show{display:block}
+.a-step{display:flex;gap:10px;align-items:center;padding:9px 6px;font-size:17px;color:#A39E93;font-weight:600}
+.a-step .ck{width:28px;height:28px;font-size:14px}
+.a-step.on{color:var(--ink);font-weight:800}
+.a-step.on .ck{background:var(--y);border-color:var(--ink);color:var(--ink)}
+.a-step.ok{color:var(--ink)}
+.a-step.ok .ck{background:var(--ok);border-color:var(--ok);color:#fff}
+.abar{height:10px;border-radius:99px;background:#F0EAD6;overflow:hidden;margin-top:8px}
+.abar i{display:block;height:100%;width:0;background:var(--y-deep);border-radius:99px;transition:width .4s}
+/* 관리자 오버레이 */
+#adminOverlay{position:fixed;inset:0;background:#20242B;display:none;z-index:100;overflow-y:auto}
+#adminOverlay.open{display:block}
+.adm{max-width:720px;margin:0 auto;padding:0 0 120px;color:#fff}
+.adm-top{position:sticky;top:0;background:#20242B;padding:14px 16px;border-bottom:1px solid #3A4048;z-index:5}
+.adm-card{background:#fff;color:var(--ink);border-radius:20px;padding:20px;margin:12px 16px}
+.adm-nav{display:flex;gap:6px;padding:10px 16px}
+.adm-nav button{flex:1;border:0;border-radius:12px;padding:13px 4px;font-size:16px;font-weight:800;background:#2C323B;color:#B9C0CC;cursor:pointer;min-height:52px}
+.adm-nav button.on{background:var(--y);color:var(--ink)}
+.pt{border:1.5px solid var(--line);border-radius:16px;padding:14px;margin:8px 0;cursor:pointer;background:#fff}
+.pt.sel{border-color:var(--ink);box-shadow:0 0 0 2px var(--y) inset}
+.stat4{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.stat{background:#2C323B;border-radius:16px;padding:14px;text-align:center}
+.stat .n{font-size:30px;font-weight:800;color:var(--y)}
+.stat .l{font-size:14px;color:#B9C0CC;font-weight:700}
+.fbemo{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:16px 4px;font-size:17px;font-weight:800;cursor:pointer;min-height:64px}
+.fbemo.on{border-color:var(--ink);background:var(--y-soft)}
+select,input,textarea{font-family:inherit;font-size:18px}
+textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14px;min-height:120px;resize:vertical}
+#toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:14px;padding:13px 20px;font-size:16px;font-weight:700;display:none;z-index:200;max-width:90%;text-align:center}
+#pinModal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:150;align-items:center;justify-content:center;padding:20px}
+#pinModal.open{display:flex}
+.pinbox{background:#fff;border-radius:22px;padding:26px 22px;max-width:380px;width:100%;text-align:center}
+.pinbox input{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:15px;font-size:22px;text-align:center;letter-spacing:8px;margin:12px 0}
+.small{font-size:14px;color:var(--sub)}
+.treat{background:var(--ok-soft);border:1px solid #BFE3CC;border-radius:14px;padding:14px;margin:10px 0;font-size:17px}
+.adm .treat{background:#2C323B;border-color:#3A4048;color:#fff}
+.rmap{height:320px;min-height:320px;border-radius:14px;overflow:hidden;border:1px solid var(--line);z-index:1;background:#F3EEDF;position:relative}
+.rmap.small{height:280px;min-height:280px}
+.rmap .fbwrap{position:absolute;inset:0;display:flex;flex-direction:column}
+.rmap .fbwrap svg{flex:1;width:100%;height:100%;display:block}
+.rmap .mapnote{position:absolute;left:10px;bottom:10px;background:rgba(25,31,40,.82);color:#fff;font-size:13px;font-weight:700;border-radius:10px;padding:7px 10px;max-width:calc(100% - 20px)}
+.rmap .retrybtn{position:absolute;right:10px;top:10px;background:#fff;border:1.5px solid var(--line);border-radius:10px;font-size:13.5px;font-weight:800;padding:8px 10px;cursor:pointer}
+.mapbtns{display:flex;gap:8px;margin-top:8px}
+.mapbtns button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 6px;font-size:15.5px;font-weight:800;cursor:pointer;min-height:52px}
+.mapbtns button.go{background:var(--ink);color:#fff;border-color:var(--ink)}
+.leaflet-container{font-family:inherit;font-size:14px}
+.gpsstat{font-size:14px;color:var(--sub);margin-top:6px}
+</style>
+<!-- 지도 라이브러리는 필요할 때만 동적으로 불러옵니다 (차단 환경에서도 흰 화면 방지) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- ===== 사용자 앱 ===== -->
+<div id="app" class="wrap">
+  <div class="hero">
+    <div class="hero-top">
+      <div class="logo" id="logo" title="가치가U">U</div>
+      <div><div class="brand1">가치가U <span style="font-size:13px;font-weight:700;background:#fff;border-radius:99px;padding:2px 10px;border:1.5px solid var(--ink)">같이 가요</span></div>
+      <div class="brand2">병원에 가는 순간부터, 집에 돌아오는 순간까지</div></div>
+      <button class="bell" id="bellBtn">&#128276;<span class="dot" id="bellDot"></span></button>
+    </div>
+    <div class="hero-hi" id="heroHi">안녕하세요, 김○○님<small>오늘 병원 가는 날이에요. 차량은 저희가 준비했어요.</small></div>
+    <svg class="hero-ill" width="150" height="86" viewBox="0 0 150 86" fill="none" stroke="#191F28" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 62 h96" stroke-dasharray="7 7"/><circle cx="34" cy="62" r="8" fill="#fff"/><circle cx="92" cy="62" r="8" fill="#fff"/>
+      <path d="M30 50 h60 l10 12 h-70 z" fill="#fff"/><circle cx="52" cy="42" r="6" fill="#fff"/><path d="M118 30 h16 v32 h-16 z M121 38 h10 M121 46 h10" fill="#fff"/>
+    </svg>
+  </div>
+
+  <!-- 홈 -->
+  <div id="view-home" class="view show">
+    <div class="sheet">
+      <div class="seg" id="whoSeg">
+        <button data-who="me" class="on">&#129489; 본인</button>
+        <button data-who="guard">&#128106; 보호자 보기</button>
+      </div>
+      <div id="homeMe">
+        <div style="font-size:34px">&#127973;</div>
+        <h2 style="font-size:26px;letter-spacing:-.5px">오늘 병원에 가요</h2>
+        <p class="muted">충남대학교병원 · 정형외과 · 오전 10:30</p>
+        <div class="kv" id="homeStatus"><b>&#128663; 차량이 준비되었어요.</b><br><span class="muted">차량 도착 예정 오전 10:05 · 휠체어 전용 차량</span></div>
+        <button class="bigbtn btn-y" id="btnMyMove" style="margin-top:10px">내 이동 확인</button>
+        <button class="bigbtn btn-soft" id="btnTell" style="margin-top:10px">보호자에게 알려주기</button>
+      </div>
+      <div id="homeGuard" style="display:none">
+        <div style="font-size:34px">&#128106;</div>
+        <h2 style="font-size:26px;letter-spacing:-.5px">김○○님의 이동 현황</h2>
+        <p class="muted">따로 동승하지 않아도 여기서 확인할 수 있어요.</p>
+        <div class="kv" id="homeGuardStatus"><b>&#128994; 병원으로 이동 중</b><br><span class="muted">예상 도착 10:25</span></div>
+        <button class="bigbtn btn-y" id="btnGoGuard" style="margin-top:10px">보호자 화면으로 보기</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>&#128663; 오늘의 이동</h3>
+      <p class="muted">집 → 충남대학교병원 · 약 25분 · 6.2km</p>
+      <div class="kv">차량 <b>휠체어 전용 차량 12가 3456</b> · 기사 김○○<br>동행 매니저 <b>이○○</b> · 보호자 미동승</div>
+      <button class="bigbtn btn-line" id="btnGoMove2">지도에서 위치 보기</button>
+    </div>
+    <div class="card">
+      <h3>&#128172; 가치가U를 사용해보셨나요?</h3>
+      <p class="muted">의견을 남겨주시면 더 편안하게 만들어드릴게요.</p>
+      <button class="bigbtn btn-soft" id="btnGoFb" style="margin-top:10px">의견 남기러 가기</button>
+    </div>
+  </div>
+
+  <!-- 이동 -->
+  <div id="view-move" class="view">
+    <div class="card">
+      <span class="pill move" id="movePill">이동 중</span>
+      <h2 id="pBig" style="margin-top:8px">병원으로 가고 있어요</h2>
+      <p class="muted" id="pEta">예상 도착 10:25 · 충남대학교병원 정형외과 10:30</p>
+      <div class="map">
+        <div id="realMap" class="rmap" role="img" aria-label="실시간 지도: 집에서 충남대학교병원까지 이동 경로"></div>
+        <div class="mapbtns">
+          <button id="btnGps1" class="go">📍 내 위치 보기 (GPS)</button>
+          <button id="btnSim1">▶ 차량 이동 시연</button>
+        </div>
+        <p class="small" id="mapLabel" style="padding:6px 6px 0">현재 상태: 차량이 준비되었어요</p>
+        <p class="gpsstat" id="gpsStat1">GPS를 누르면 내 현재 위치(파란 점)가 지도에 표시됩니다 · 위치는 이 기기에서만 사용됩니다</p>
+      </div>
+      <div class="steps" id="pSteps"></div>
+      <div class="kv" id="carInfo"><b>휠체어 전용 차량</b> 12가 3456 · 기사 김○○ (010-○○○○-○○○○)<br>동행 매니저 이○○ · 승하차 지원 포함</div>
+    </div>
+    <div class="card">
+      <h3>도움이 필요하신가요?</h3>
+      <div class="row">
+        <button class="bigbtn btn-line" id="btnCall" style="flex:1">&#128222; 기사님께 전화</button>
+        <button class="bigbtn btn-line" id="btnMgr" style="flex:1">&#129309; 매니저 호출</button>
+      </div>
+      <p class="small" style="margin-top:8px">버튼을 누르면 전화 연결 화면으로 이동합니다. (시제품에서는 알림으로 표시됩니다)</p>
+    </div>
+  </div>
+
+  <!-- 보호자 -->
+  <div id="view-guardian" class="view">
+    <div class="card">
+      <span class="pill ok" id="gNow2">안심 알림 켜짐</span>
+      <h2 style="margin-top:8px">김○○님의 이동 현황</h2>
+      <p class="muted" id="gNow">차량이 준비되었어요 · 김○○님</p>
+      <div class="map">
+        <div id="realMapG" class="rmap small" role="img" aria-label="보호자용 실시간 지도"></div>
+        <div class="mapbtns">
+          <button id="btnGps2" class="go">📍 내 위치 보기 (GPS)</button>
+          <button id="btnSim2">▶ 차량 이동 시연</button>
+        </div>
+        <p class="small" id="gMapLabel">차량이 곧 출발합니다.</p>
+        <p class="gpsstat" id="gpsStat2">같은 차량 위치가 보호자 지도에도 함께 표시됩니다</p>
+      </div>
+      <div class="steps" id="gSteps"></div>
+      <div class="treat" id="gTreat" style="display:none"><b>진료가 완료되었어요.</b><br>정형외과 · 다음 진료 10월 15일(수) 10:30<br>안내: 무릎 상태 확인, 다음 방문 시 보호자 동행 권장 <span class="small">(가상 데이터·동의 전제)</span></div>
+    </div>
+  </div>
+
+  <!-- 알림 -->
+  <div id="view-alerts" class="view">
+    <div class="card"><h2>&#128276; 알림</h2><p class="muted">이동 상황이 바뀔 때마다 여기에 알려드려요.</p><div id="notifList" style="margin-top:10px"></div></div>
+  </div>
+
+  <!-- 내 정보 -->
+  <div id="view-my" class="view">
+    <div class="card"><h2>내 정보</h2>
+      <div class="kv"><b>김○○님</b> · 72세<br>이동 조건: 휠체어 이용 · 장거리 보행 어려움<br>보호자: 딸 김○○ (010-○○○○-○○○○)</div>
+      <button class="bigbtn btn-soft" id="btnGoFb2">의견 남기기 (피드백보드)</button>
+      <p class="small" style="margin-top:14px">입력하신 연락처는 문의 응대 목적으로만 사용되며 이 기기 브라우저에만 저장됩니다.</p>
+      <p class="small" id="verLine" style="margin-top:18px;color:#C4C9D1;user-select:none">가치가U 시제품 v1.0.0</p>
+    </div>
+  </div>
+
+  <!-- 피드백 -->
+  <div id="view-feedback" class="view">
+    <div class="card"><h2>가치가U를 사용해보셨나요?</h2>
+      <p class="muted">큰 버튼 하나만 눌러주세요.</p>
+      <div class="row" style="margin-top:10px">
+        <button class="fbemo" data-fb="좋아요">&#128522;<br>좋아요</button>
+        <button class="fbemo" data-fb="보통이에요">&#128528;<br>보통이에요</button>
+        <button class="fbemo" data-fb="불편해요">&#128577;<br>불편해요</button>
+      </div>
+      <p class="muted" style="margin:14px 0 6px">어떤 점이 좋았나요? 불편했나요? 추가되었으면 하는 기능이 있나요?</p>
+      <div class="row" style="margin-bottom:8px">
+        <select id="fbCat" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:13px;min-height:52px">
+          <option>이동</option><option>차량</option><option>병원</option><option>보호자</option><option>진료정보</option><option>UI/UX</option><option>기타</option>
+        </select>
+      </div>
+      <textarea id="fbText" placeholder="편하게 적어주세요. 예) 글씨가 커서 보기 편했어요."></textarea>
+      <button class="bigbtn btn-y" id="btnFb" style="margin-top:10px">의견 보내기</button>
+      <p class="small" style="margin-top:8px">의견은 이 기기 브라우저에만 저장되는 시제품용 기록입니다.</p>
+    </div>
+  </div>
+
+  <div class="bottom"><div class="bottom-in" id="bottomnav">
+    <button class="navbtn on" data-tab="home"><span class="ic">&#127968;</span>홈</button>
+    <button class="navbtn" data-tab="move"><span class="ic">&#128663;</span>이동</button>
+    <button class="navbtn" data-tab="guardian"><span class="ic">&#128106;</span>보호자</button>
+    <button class="navbtn" data-tab="my"><span class="ic">&#128100;</span>내 정보</button>
+  </div></div>
+</div>
+
+<!-- ===== 숨은 관리자 모드 ===== -->
+<div id="adminOverlay">
+  <div class="adm">
+    <div class="adm-top row">
+      <div><div style="font-size:19px;font-weight:800">&#127973; 병원 관리자 <span class="pill" style="margin-left:6px">숨김 모드</span></div>
+      <div class="small" style="color:#B9C0CC">일반 화면에서는 보이지 않습니다 · 시연용 번호로 입장</div></div>
+      <button id="btnAdmClose" style="margin-left:auto;background:var(--y);border:0;border-radius:12px;padding:13px 16px;font-size:16px;font-weight:800;cursor:pointer;min-height:52px">✕ 닫기</button>
+    </div>
+    <div class="adm-nav">
+      <button data-atab="dash" class="on">대시보드</button>
+      <button data-atab="pts">환자</button>
+      <button data-atab="move">이동관리</button>
+      <button data-atab="fb">피드백 <span id="fbCount">0</span></button>
+    </div>
+    <div class="card adm-card" style="margin:12px 16px;background:var(--y);border-color:var(--y)">
+      <div class="row"><b id="stepLabel" style="font-size:17px">STEP 4/11 · 환자 앱 확인</b>
+      <button id="nextStepBtn" style="margin-left:auto;background:var(--ink);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:800;cursor:pointer;white-space:nowrap">다음 &#9654;</button></div>
+      <div class="small" id="stepDesc" style="color:#5B543F">환자 앱에서 차량 준비 안내를 확인하는 단계입니다.</div>
+    </div>
+    <!-- 대시보드 -->
+    <div id="atab-dash">
+      <div class="adm-card"><h2>오늘의 외래 이동 관리</h2><p class="muted">충남대학교병원 · 9월 17일(목) · 진료만 등록하면 이동이 자동 연결됩니다.</p>
+        <div class="stat4" style="margin-top:12px">
+          <div class="stat" style="background:var(--y-soft)"><div class="n" style="color:var(--ink)">24</div><div class="l" style="color:var(--sub)">오늘 진료 예정</div></div>
+          <div class="stat" style="background:#EFF1F3"><div class="n" style="color:var(--ink)">18</div><div class="l" style="color:var(--sub)">이동 자동 연결</div></div>
+          <div class="stat"><div class="n" id="statMoving">5</div><div class="l">이동 중</div></div>
+          <div class="stat"><div class="n" id="statDone">13</div><div class="l">도착 완료</div></div>
+        </div>
+        <button class="bigbtn btn-y" id="btnRegister">김○○님 외래 진료 등록하기 (자동 연결 시연)</button>
+        <div class="auto" id="autoflow">
+          <div class="a-step">&#9679; 외래 일정이 등록되었습니다.</div>
+          <div class="a-step">&#9679; 환자 상태를 분석하고 있습니다.</div>
+          <div class="a-step">&#9679; 맞춤 이동수단을 찾고 있습니다.</div>
+          <div class="a-step">&#9679; 차량이 자동으로 배정되었습니다.</div>
+          <div class="a-step">&#9679; 동행 매니저가 매칭되었습니다.</div>
+          <div class="a-step">&#9679; 이동 준비 완료</div>
+          <div class="abar"><i id="autobar"></i></div>
+        </div>
+      </div>
+      <div class="adm-card"><h3>환자 리스트</h3><div id="ptList"></div></div>
+    </div>
+    <!-- 환자 상세 -->
+    <div id="atab-pts" style="display:none">
+      <div class="adm-card" id="ptDetailCard">
+        <h2 id="dName">김○○님</h2>
+        <div class="kv">진료과 <b id="dDept">정형외과</b> · 진료시간 <b id="dTime">10:30</b><br>이동 조건 <b id="dCond">휠체어 이용</b> · 보호자 <b id="dGuard">미동승</b><br>상태 <b id="dStatus">차량 배정 완료</b></div>
+        <h3 style="margin-top:12px">[AI 이동 분석] <span class="small">Mock 분석 결과</span></h3>
+        <div class="kv">&#10003; 휠체어 이용<br>&#10003; 장거리 보행 어려움<br>&#10003; 보호자 미동승<br>AI 추천: <b>휠체어 탑승 차량 + 동행 매니저</b></div>
+        <h3>[자동 배차]</h3>
+        <div class="kv">차량 <b>휠체어 전용 차량 12가 3456</b> · 기사 김○○ · 도착 예정 10:05<br>동행 매니저 <b>이○○</b> · 상태 <b>배정 완료</b></div>
+        <div class="row">
+          <button class="bigbtn btn-soft" id="btnArrived" style="flex:1">도착</button>
+          <button class="bigbtn btn-soft" id="btnComplete" style="flex:1">진료 완료</button>
+          <button class="bigbtn btn-y" id="btnReturn" style="flex:1">귀가 차량 연결</button>
+        </div>
+      </div>
+    </div>
+    <!-- 이동관리 -->
+    <div id="atab-move" style="display:none">
+      <div class="adm-card"><h3>이동 상황 모니터링</h3><p class="muted">환자·보호자·병원 상태가 함께 바뀝니다.</p><div class="steps" id="monitorSteps"></div>
+      <div class="treat" style="background:var(--y-soft);border-color:var(--y-line)"><b id="monMsg">차량이 준비되었어요. 환자 앱을 확인하세요.</b></div></div>
+    </div>
+    <!-- 피드백 관리 -->
+    <div id="atab-fb" style="display:none">
+      <div class="adm-card"><h3>피드백 확인 <span class="small">(관리자 전용)</span></h3><div id="fbList"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 관리자 PIN -->
+<div id="pinModal"><div class="pinbox">
+  <div style="font-size:15px;font-weight:800;color:var(--sub)">숨겨진 메뉴</div>
+  <h2 style="font-size:24px;margin:4px 0">병원 관리자 로그인</h2>
+  <p class="muted">관리자만 볼 수 있는 화면입니다.<br>시연용 번호 <b>1234</b></p>
+  <input id="pinInput" inputmode="numeric" maxlength="4" placeholder="••••">
+  <button class="bigbtn btn-y" id="pinOk">들어가기</button>
+  <button class="bigbtn btn-line" id="pinCancel" style="margin-top:8px">닫기</button>
+</div></div>
+
+<script>
+var S={tab:"home",who:"me",stage:2,fb:null,sel:0,unread:1,notifs:[
+ {t:"차량이 준비되었어요",d:"휠체어 전용 차량 · 도착 예정 10:05",at:"오늘 오전 9:40"},
+ {t:"외래 일정이 등록되었습니다",d:"정형외과 10:30 · 이동 자동 연결 시작",at:"오늘 오전 9:38"}],
+ patients:[
+  {n:"김○○",dept:"정형외과",time:"10:30",cond:"휠체어 · 보호자 미동승",st:"차량이 준비되었어요",cls:""},
+  {n:"이○○",dept:"재활의학과",time:"11:00",cond:"보행기 · 보호자 동승",st:"이동 중",cls:"moving"},
+  {n:"박○○",dept:"내과",time:"11:30",cond:"목발 · 보호자 미동승",st:"도착 완료",cls:"done"}]};
+var T=["진료 등록 대기","분석하고 있어요","차량이 준비되었어요","병원으로 이동 중이에요","병원에 도착했어요","진료가 끝났어요","집으로 가고 있어요"];
+var D=["진료 등록을 기다리고 있어요","환자 상태를 분석하고 있습니다","차량 도착 예정 오전 10:05","예상 도착 10:25","접수가 도와드릴게요","보호자에게 알려드렸어요","귀가 차량이 도착했어요"];
+var PMS=["차량 준비","차량 도착","이동 중","병원 도착","진료 완료","귀가"];
+function toast(m){var e=document.getElementById("toast");e.textContent=m;e.style.display="block";clearTimeout(e._t);e._t=setTimeout(function(){e.style.display="none"},2200)}
+function tabFromHash(){var h=location.hash.replace("#/","");if(["home","move","guardian","alerts","my","feedback"].indexOf(h)>=0)return h;return "home"}
+function setTab(t){S.tab=t;try{history.replaceState(null,"","#/"+t)}catch(e){location.hash="/"+t}render()}
+function render(){var views={home:document.getElementById("view-home"),move:document.getElementById("view-move"),guardian:document.getElementById("view-guardian"),alerts:document.getElementById("view-alerts"),my:document.getElementById("view-my"),feedback:document.getElementById("view-feedback")};Object.keys(views).forEach(function(v){views[v].classList.toggle("show",S.tab===v)});
+ document.querySelectorAll(".navbtn").forEach(function(b){b.classList.toggle("on",b.dataset.tab===S.tab)});
+ document.getElementById("bellDot").style.display=S.unread>0?"block":"none";
+ renderSteps();updateTexts()}
+function renderSteps(){var i=S.stage;
+ var labels=["차량 준비","차량 도착","이동 중","병원 도착","진료 완료","귀가"];
+ var cut=[2,3,3,4,5,6,6][Math.min(6,i)];
+ var h="";labels.forEach(function(L,k){var c=k<cut?"done":(k===cut?"now":"");var m=k<cut?"✓":(k===cut?"●":"○");h+='<div class="step '+c+'"><div class="ck">'+m+'</div><div>'+L+'</div></div>'});document.getElementById("pSteps").innerHTML=h;
+ var G=["출발","차량 탑승","병원으로 이동 중","병원 도착","진료 중","진료 완료","귀가"];var h2="";G.forEach(function(L,k){var c=k<i||(i>=6&&k<=6)?"done":(k===i?"now":"");if(i===0)c=k===0?"now":"";var m=c==="done"?"✓":(c==="now"?"●":"○");h2+='<div class="step '+c+'"><div class="ck">'+m+'</div><div>'+L+'</div></div>'});document.getElementById("gSteps").innerHTML=h2;
+ var h3="";G.forEach(function(L,k){var c=k<i?"done":(k===i?"now":"");var m=c==="done"?"✓":(c==="now"?"●":"○");h3+='<div class="step '+c+'"><div class="ck">'+m+'</div><div>'+L+'</div></div>'});var ms=document.getElementById("monitorSteps");if(ms)ms.innerHTML=h3;
+ if(simP===null||true){try{updateCarOnMaps();}catch(e){}}
+ try{refreshMapSize();}catch(e){}}
+function updateTexts(){var i=S.stage;
+ document.getElementById("pBig").textContent=T[i];document.getElementById("pEta").textContent=D[i]+" · 충남대학교병원 정형외과 10:30";
+ document.getElementById("mapLabel").textContent="현재 상태: "+T[i]+" ("+D[i]+")";
+ document.getElementById("movePill").textContent=i<=2?"준비 중":(i<=3?"이동 중":(i===4?"도착":(i===5?"진료 완료":"귀가 중")));
+ var G=["대기 중","분석 중","차량이 준비되었어요","병원으로 이동 중","병원에 도착했어요","진료가 완료되었어요","집으로 가고 있어요"];
+ document.getElementById("gNow").textContent=G[i]+" · 김○○님";
+ document.getElementById("gMapLabel").textContent="현재 상태: "+T[i];
+ document.getElementById("gTreat").style.display=i>=5?"block":"none";
+ document.getElementById("homeStatus").innerHTML=i<=1?"<b>이동 준비 중이에요.</b><br><span class='muted'>진료 등록 후 자동으로 연결됩니다</span>":("<b>&#128663; "+T[i]+"</b><br><span class='muted'>"+D[i]+" · 휠체어 전용 차량</span>");
+ document.getElementById("homeGuardStatus").innerHTML="<b>"+(i<=2?"&#128993; 곧 출발해요":(i===3?"&#128994; 병원으로 이동 중":(i===4?"&#127973; 병원에 도착했어요":(i===5?"&#128137; 진료가 끝났어요":"&#127968; 집으로 가고 있어요"))))+"</b><br><span class='muted'>"+D[i]+"</span>";
+ document.getElementById("heroHi").innerHTML=(S.tab==="guardian"?"보호자님, 안녕하세요.<small>김○○님의 이동을 함께 지켜봐 주세요.</small>":"안녕하세요, 김○○님<small>오늘 병원 가는 날이에요. 차량은 저희가 준비했어요.</small>");
+ S.patients[0].st=T[Math.max(2,i)];S.patients[0].cls=i>=4?"done":(i>=2?"moving":"");
+ renderPatients();syncDetail();
+ var nl=document.getElementById("notifList");nl.innerHTML="";S.notifs.slice().reverse().forEach(function(n){var d=document.createElement("div");d.className="kv";d.innerHTML="<b>"+n.t+"</b><br><span class='muted'>"+n.d+" · "+n.at+"</span>";nl.appendChild(d)});
+ var mm=document.getElementById("monMsg");if(mm)mm.textContent=T[i]+". "+D[i];
+ var sm=["외래 진료 등록 화면입니다","분석 중이에요","차량 배정 완료","환자 앱 확인","이동 중","보호자 확인 · 병원 도착","진료 완료 · 귀가"];
+ document.getElementById("stepLabel").textContent="STEP "+Math.min(11,Math.max(1,i+1))+"/11 · "+sm[Math.min(6,i)];
+ document.getElementById("stepDesc").textContent=D[i];
+ document.getElementById("statMoving").textContent=i>=3&&i<=4?"6":"5";
+ document.getElementById("statDone").textContent=i>=4?"14":"13";}
+function pushNotif(t,d){S.notifs.push({t:t,d:d,at:"오늘 "+new Date().toTimeString().slice(0,5)});S.unread++}
+function setStage(i,msg){S.stage=Math.max(0,Math.min(6,i));if(msg){pushNotif(msg,"김○○님 · 정형외과 10:30");toast(msg)}render()}
+/* 환자 리스트 */
+function renderPatients(){var w=document.getElementById("ptList");if(!w)return;w.innerHTML="";S.patients.forEach(function(p,k){var d=document.createElement("div");d.className="pt"+(k===S.sel?" sel":"");var badge=p.cls==="done"?"ok":(p.cls==="moving"?"move":"");d.innerHTML="<b style='font-size:19px'>"+p.n+"</b> <span class='pill "+badge+"'>"+p.st+"</span><br><span class='muted'>"+p.dept+" · "+p.time+" 진료 · "+p.cond+"</span>";d.onclick=function(){S.sel=k;syncDetail();renderPatients()};w.appendChild(d)})}
+function syncDetail(){var p=S.patients[S.sel];if(!p||!document.getElementById("dName"))return;document.getElementById("dName").textContent=p.n+"님";document.getElementById("dDept").textContent=p.dept;document.getElementById("dTime").textContent=p.time;document.getElementById("dCond").textContent=p.cond.split(" ·")[0];document.getElementById("dGuard").textContent=p.cond.indexOf("미동승")>=0?"미동승":"동승";document.getElementById("dStatus").textContent=p.st}
+/* 관리자 숨김 진입 */
+var tapN=0,tapT=0;
+function openPin(){document.getElementById("pinModal").classList.add("open");setTimeout(function(){document.getElementById("pinInput").focus()},100)}
+function closePin(){document.getElementById("pinModal").classList.remove("open")}
+function openAdmin(){document.getElementById("adminOverlay").classList.add("open");renderFb()}
+function closeAdmin(){document.getElementById("adminOverlay").classList.remove("open");if(location.hash==="#/admin"){try{history.replaceState(null,"","#/"+S.tab)}catch(e){}}}
+document.getElementById("verLine").onclick=function(){var n=Date.now();if(n-tapT>2000)tapN=0;tapT=n;tapN++;if(tapN>=5){tapN=0;openPin()}else if(tapN===3)toast("관리자 메뉴는 숨겨져 있어요")};
+var pressT=null;var logo=document.getElementById("logo");
+logo.addEventListener("touchstart",function(){pressT=setTimeout(openPin,1500)});logo.addEventListener("touchend",function(){clearTimeout(pressT)});
+logo.addEventListener("mousedown",function(){pressT=setTimeout(openPin,1500)});logo.addEventListener("mouseup",function(){clearTimeout(pressT)});
+document.getElementById("pinOk").onclick=function(){var v=document.getElementById("pinInput").value.trim();if(v==="1234"){closePin();openAdmin();toast("관리자 모드로 들어갔어요")}else{toast("번호가 맞지 않아요")}}; 
+document.getElementById("pinCancel").onclick=closePin;
+document.getElementById("btnAdmClose").onclick=closeAdmin;
+/* 내비·버튼 */
+document.querySelectorAll(".navbtn").forEach(function(b){b.onclick=function(){setTab(b.dataset.tab);window.scrollTo({top:0})}});
+document.getElementById("bellBtn").onclick=function(){S.unread=0;setTab("alerts")};
+document.querySelectorAll("#whoSeg button").forEach(function(b){b.onclick=function(){document.querySelectorAll("#whoSeg button").forEach(function(x){x.classList.remove("on")});b.classList.add("on");var me=b.dataset.who==="me";document.getElementById("homeMe").style.display=me?"block":"none";document.getElementById("homeGuard").style.display=me?"none":"block"}});
+document.getElementById("btnMyMove").onclick=function(){setStage(3,"병원으로 출발했어요");setTab("move")};
+document.getElementById("btnTell").onclick=function(){toast("보호자에게 이동 상황을 보냈어요")};
+document.getElementById("btnGoGuard").onclick=function(){setTab("guardian")};
+document.getElementById("btnGoMove2").onclick=function(){setTab("move")};
+document.getElementById("btnGoFb").onclick=function(){setTab("feedback")};
+document.getElementById("btnGoFb2").onclick=function(){setTab("feedback")};
+document.getElementById("btnGps1").onclick=startGps;
+document.getElementById("btnGps2").onclick=startGps;
+document.getElementById("btnSim1").onclick=startSim;
+document.getElementById("btnSim2").onclick=startSim;
+var _setTab=setTab;setTab=function(t){_setTab(t);setTimeout(refreshMapSize,150);};
+document.getElementById("btnCall").onclick=function(){toast("기사 김○○님께 연결합니다 (시제품)")};
+document.getElementById("btnMgr").onclick=function(){toast("동행 매니저 이○○님을 불렀어요")};
+document.querySelectorAll(".adm-nav button").forEach(function(b){b.onclick=function(){document.querySelectorAll(".adm-nav button").forEach(function(x){x.classList.remove("on")});b.classList.add("on");(function(){var atabs={dash:document.getElementById("atab-dash"),pts:document.getElementById("atab-pts"),move:document.getElementById("atab-move"),fb:document.getElementById("atab-fb")};Object.keys(atabs).forEach(function(k){atabs[k].style.display=b.dataset.atab===k?"block":"none"})})()}});
+/* 자동 연결 시연 */
+document.getElementById("btnRegister").onclick=function(){var f=document.getElementById("autoflow");f.classList.add("show");var steps=f.querySelectorAll(".a-step");steps.forEach(function(s){s.classList.remove("on","ok")});document.getElementById("autobar").style.width="0";var k=0;setStage(1,"외래 일정이 등록되었습니다");
+ function tick(){if(k>0){steps[k-1].classList.remove("on");steps[k-1].classList.add("ok")}if(k>=steps.length){setStage(2,"이동 준비 완료! 환자 앱을 확인하세요");closeAdmin();setTab("home");return}steps[k].classList.add("on");document.getElementById("autobar").style.width=(k+1)/steps.length*100+"%";k++;setTimeout(tick,650)}tick()};
+document.getElementById("btnArrived").onclick=function(){setStage(4,"김○○님이 병원에 도착했습니다")};
+document.getElementById("btnComplete").onclick=function(){setStage(5,"진료가 완료되었습니다. 보호자에게 알려드렸어요")};
+document.getElementById("btnReturn").onclick=function(){setStage(6,"귀가 차량이 준비되었어요")};
+document.getElementById("nextStepBtn").onclick=function(){var n=(S.stage+1)%7;setStage(n);if(n===2){} if(n===3&&!document.getElementById("adminOverlay").classList.contains("open"))setTab("move");if(n>=4&&n<=5&&!document.getElementById("adminOverlay").classList.contains("open"))setTab("guardian")};
+/* 피드백 */
+document.querySelectorAll(".fbemo").forEach(function(b){b.onclick=function(){document.querySelectorAll(".fbemo").forEach(function(x){x.classList.remove("on")});b.classList.add("on");S.fb=b.dataset.fb}});
+function loadFb(){try{return JSON.parse(localStorage.getItem("gachiga_fb")||"[]")}catch(e){return[]}}
+function renderFb(){var a=loadFb();document.getElementById("fbCount").textContent=a.length;var w=document.getElementById("fbList");if(!w)return;if(!a.length){w.innerHTML='<p class="muted">아직 의견이 없습니다.</p>';return}w.innerHTML="";a.slice().reverse().forEach(function(f){var d=document.createElement("div");d.className="kv";d.innerHTML="<b>"+f.mood+"</b> · "+(f.cat||"기타")+"<br>"+f.text+"<br><span class='small'>"+f.at+"</span>";w.appendChild(d)})}
+document.getElementById("btnFb").onclick=function(){var t=document.getElementById("fbText").value.trim();if(!S.fb){toast("위에서 좋아요·보통이에요·불편해요 중 하나를 골라주세요");return}if(!t){toast("의견을 한 줄이라도 적어주세요");return}var a=loadFb();a.push({mood:S.fb,cat:document.getElementById("fbCat").value.trim()||"기타",text:t.replace(/</g,"&lt;"),at:new Date().toLocaleString("ko-KR")});localStorage.setItem("gachiga_fb",JSON.stringify(a));document.getElementById("fbText").value="";renderFb();toast("의견을 보내주셔서 감사합니다")};
+window.addEventListener("hashchange",function(){if(location.hash==="#/admin"){openPin();return}var t=tabFromHash();if(t!==S.tab){S.tab=t;render()}});
+(function(){if(location.hash==="#/admin"){openPin()}var t=tabFromHash();S.tab=t;render();renderPatients();syncDetail();renderFb()})();
+
+/* ===== 진짜 지도 (Leaflet + OpenStreetMap) + 차단환경 폴백 약도 + GPS ===== */
+var HOME_LL=[36.3510,127.3780];
+var HOSP_LL=[36.3046,127.4236];
+var ROUTE_LL=[[36.3510,127.3780],[36.3445,127.3880],[36.3350,127.4000],[36.3220,127.4120],[36.3120,127.4190],[36.3046,127.4236]];
+var map1=null,map2=null,carMk1=null,carMk2=null,gpsMk1=null,gpsMk2=null,mapsReady=false,leafletLoading=false;
+var simP=null,simTimer=null,gpsWatch=null,gpsFixed=false;
+function routePos(p){p=Math.max(0,Math.min(1,p));var seg=ROUTE_LL.length-1;var f=p*seg;var k=Math.min(seg-1,Math.floor(f));var r=f-k;var a=ROUTE_LL[k],b=ROUTE_LL[k+1];return [a[0]+(b[0]-a[0])*r,a[1]+(b[1]-a[1])*r];}
+function carProgress(){if(simP!==null)return simP;return [0.06,0.18,0.06,0.38,0.68,0.85,0.97][Math.min(6,S.stage)];}
+/* --- 폴백 약도: 인터넷이 막혀도 절대 흰 화면이 안 나오게 --- */
+function routeXY(p){p=Math.max(0,Math.min(1,p));return [24+p*552, 190-p*140];}
+function fallbackSVG(progress, label){
+  var c=routeXY(progress), h=routeXY(0), e=routeXY(1);
+  return '<div class="fbwrap"><svg viewBox="0 0 600 220" preserveAspectRatio="xMidYMid meet" role="img" aria-label="'+label+'">'
+  +'<rect x="0" y="0" width="600" height="220" fill="#F3EEDF"/>'
+  +'<g stroke="#E3D9BE" stroke-width="2">'+[20,60,100,140,180].map(function(y){return '<line x1="0" y1="'+y+'" x2="600" y2="'+y+'"/>'}).join("")+'</g>'
+  +'<path d="M24 190 L150 160 L280 120 L420 80 L576 50" fill="none" stroke="#DFAF2B" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>'
+  +'<path d="M24 190 L150 160 L280 120 L420 80 L576 50" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="10 9" stroke-linecap="round"/>'
+  +'<g><circle cx="'+h[0]+'" cy="'+h[1]+'" r="17" fill="#191F28"/><text x="'+h[0]+'" y="'+(h[1]+7)+'" text-anchor="middle" font-size="16">🏠</text><text x="'+h[0]+'" y="'+(h[1]+36)+'" text-anchor="middle" font-size="14" font-weight="800" fill="#191F28">집</text></g>'
+  +'<g><circle cx="'+e[0]+'" cy="'+e[1]+'" r="17" fill="#fff" stroke="#191F28" stroke-width="2.5"/><text x="'+e[0]+'" y="'+(e[1]+7)+'" text-anchor="middle" font-size="16">🏥</text><text x="'+e[0]+'" y="'+(e[1]+36)+'" text-anchor="middle" font-size="14" font-weight="800" fill="#191F28">충남대병원</text></g>'
+  +'<g><circle cx="'+c[0]+'" cy="'+c[1]+'" r="19" fill="#F2D56E" stroke="#191F28" stroke-width="3"/><text x="'+c[0]+'" y="'+(c[1]+8)+'" text-anchor="middle" font-size="19">🚗</text></g>'
+  +'</svg></div>';
+}
+function showFallback(id, note){
+  var el=document.getElementById(id); if(!el) return;
+  el.innerHTML=fallbackSVG(carProgress(), id==="realMap"?"집에서 병원까지 이동 경로 약도":"보호자용 이동 경로 약도")
+    +'<button class="retrybtn" data-retry="'+id+'">↻ 실제지도로 다시 시도</button>'
+    +'<div class="mapnote">'+note+'</div>';
+  Array.prototype.forEach.call(el.querySelectorAll("[data-retry]"), function(b){
+    b.onclick=function(ev){ev.stopPropagation(); loadLeafletThenInit(true);};
+  });
+}
+function updateFallbackCars(){
+  ["realMap","realMapG"].forEach(function(id){
+    var el=document.getElementById(id); if(!el||!el.querySelector(".fbwrap")) return;
+    var note=el.querySelector(".mapnote"); var ntxt=note?note.textContent:"";
+    el.innerHTML=fallbackSVG(carProgress(), "이동 경로 약도")
+      +'<button class="retrybtn" data-retry="'+id+'">↻ 실제지도로 다시 시도</button>'
+      +'<div class="mapnote">'+ntxt+'</div>';
+    Array.prototype.forEach.call(el.querySelectorAll("[data-retry]"), function(b){
+      b.onclick=function(ev){ev.stopPropagation(); loadLeafletThenInit(true);};
+    });
+  });
+}
+/* --- Leaflet 동적 로딩 (여러 CDN 순차 시도) --- */
+var LEAFLET_CSS=["https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css","https://unpkg.com/leaflet@1.9.4/dist/leaflet.css","https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"];
+var LEAFLET_JS=["https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js","https://unpkg.com/leaflet@1.9.4/dist/leaflet.js","https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"];
+function loadScriptSeq(urls, done){
+  if(!urls.length){done(false);return;}
+  var s=document.createElement("script"); s.src=urls[0]; s.async=true;
+  s.onload=function(){done(true);}; s.onerror=function(){s.remove(); loadScriptSeq(urls.slice(1), done);};
+  document.head.appendChild(s);
+}
+function ensureLeaflet(cb){
+  if(typeof L!=="undefined"){cb(true);return;}
+  if(leafletLoading){var w=setInterval(function(){if(typeof L!=="undefined"){clearInterval(w);cb(true);}},300); setTimeout(function(){clearInterval(w); if(typeof L==="undefined")cb(false);},9000); return;}
+  leafletLoading=true;
+  loadScriptSeq(LEAFLET_JS, function(ok){ leafletLoading=false; cb(ok && typeof L!=="undefined"); });
+}
+function carEmojiIcon(bg){return L.divIcon({className:"",html:'<div style="width:40px;height:40px;border-radius:50%;background:'+bg+';border:3px solid #191F28;display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 3px 10px rgba(0,0,0,.25)">🚗</div>',iconSize:[40,40],iconAnchor:[20,20]});}
+function buildRealMaps(){
+  try{
+    if(map1){map1.remove();map1=null;} if(map2){map2.remove();map2=null;}
+    carMk1=carMk2=gpsMk1=gpsMk2=null; gpsFixed=false;
+    var t1=document.getElementById("realMap"), t2=document.getElementById("realMapG");
+    if(t1)t1.innerHTML=""; if(t2)t2.innerHTML="";
+    map1=L.map("realMap",{scrollWheelZoom:false}).setView([36.328,127.400],12);
+    var tl1=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map1);
+    tl1.on("tileerror", function(){ showTileWarn("realMap"); });
+    L.marker(HOME_LL).addTo(map1).bindPopup("집 · 둔산동 (가상 출발지)");
+    L.marker(HOSP_LL).addTo(map1).bindPopup("충남대학교병원");
+    L.polyline(ROUTE_LL,{weight:6}).addTo(map1);
+    carMk1=L.marker(routePos(carProgress()),{icon:carEmojiIcon("#F2D56E")}).addTo(map1).bindPopup("휠체어 전용 차량");
+    map1.fitBounds(L.latLngBounds(ROUTE_LL),{padding:[18,18]});
+    if(S.tab==="move"){ setTimeout(function(){try{map1.invalidateSize();}catch(e){}},200); }
+    map2=L.map("realMapG",{scrollWheelZoom:false}).setView([36.328,127.400],12);
+    var tl2=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map2);
+    tl2.on("tileerror", function(){ showTileWarn("realMapG"); });
+    L.marker(HOME_LL).addTo(map2).bindPopup("집");
+    L.marker(HOSP_LL).addTo(map2).bindPopup("충남대학교병원");
+    L.polyline(ROUTE_LL,{weight:6}).addTo(map2);
+    carMk2=L.marker(routePos(carProgress()),{icon:carEmojiIcon("#2E9E63")}).addTo(map2).bindPopup("김○○님 탑승 차량");
+    map2.fitBounds(L.latLngBounds(ROUTE_LL),{padding:[18,18]});
+    if(S.tab==="guardian"){ setTimeout(function(){try{map2.invalidateSize();}catch(e){}},200); }
+    mapsReady=true; updateCarOnMaps();
+    setTimeout(checkTilesLoaded, 6000);
+  }catch(e){ mapsReady=false; showFallback("realMap","실제지도를 열지 못했어요. 아래 약도로 이동을 확인하세요."); showFallback("realMapG","실제지도를 열지 못했어요. 아래 약도로 이동을 확인하세요."); }
+}
+function showTileWarn(id){
+  var el=document.getElementById(id); if(!el||el.querySelector(".mapnote")) return;
+  var d=document.createElement("div"); d.className="mapnote";
+  d.textContent="지도 그림을 일부 불러오지 못했어요. 인터넷이 느리면 약도로도 볼 수 있어요.";
+  el.appendChild(d);
+}
+function checkTilesLoaded(){
+  try{
+    var n=document.querySelectorAll("#realMap img.leaflet-tile-loaded, #realMapG img.leaflet-tile-loaded").length;
+    if(n===0 && mapsReady){
+      showFallback("realMap","인터넷이 막혀 실제지도를 불러오지 못했어요. 발표용 약도로 자동 전환했습니다. 게시된 주소에서는 실제지도가 표시됩니다.");
+      try{ if(map1){map1.remove();map1=null;} if(map2){map2.remove();map2=null;} }catch(e){}
+      mapsReady=false; carMk1=carMk2=null;
+      showFallback("realMapG","인터넷이 막혀 실제지도를 불러오지 못했어요. 발표용 약도로 자동 전환했습니다.");
+    }
+  }catch(e){}
+}
+function loadLeafletThenInit(force){
+  // 먼저 약도를 깔아 흰 화면을 없앤 뒤, 실제지도 로딩 시도
+  if(!mapsReady){
+    if(!document.querySelector("#realMap .fbwrap")) showFallback("realMap","실제지도를 불러오는 중이에요…");
+    if(!document.querySelector("#realMapG .fbwrap")) showFallback("realMapG","실제지도를 불러오는 중이에요…");
+  }
+  ensureLeaflet(function(ok){
+    if(ok){ buildRealMaps(); }
+    else{
+      mapsReady=false;
+      showFallback("realMap","인터넷이 막혀 실제지도를 불러오지 못했어요. 발표용 약도로 보여드립니다. (게시된 주소에서는 실제지도가 표시됩니다)");
+      showFallback("realMapG","인터넷이 막혀 실제지도를 불러오지 못했어요. 발표용 약도로 보여드립니다.");
+    }
+  });
+}
+function initMaps(){ loadLeafletThenInit(false); }
+function updateCarOnMaps(){var ll=routePos(carProgress());if(carMk1)carMk1.setLatLng(ll);if(carMk2)carMk2.setLatLng(ll);updateFallbackCars();}
+function refreshMapSize(){try{if(map1&&S.tab==="move")map1.invalidateSize();if(map2&&S.tab==="guardian")map2.invalidateSize();}catch(e){}}
+function startGps(){
+ if(!navigator.geolocation){toast("이 기기에서 GPS를 쓸 수 없어요");return;}
+ if(!(window.isSecureContext||location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
+   toast("GPS는 게시된 주소(https)에서 위치 허용을 눌러야 동작해요. 지금은 차량 시연으로 보세요");
+ }
+ toast("GPS로 내 위치를 찾고 있어요…");
+ if(gpsWatch!==null){toast("이미 내 위치를 보고 있어요");return;}
+ gpsWatch=navigator.geolocation.watchPosition(function(pos){
+  var ll=[pos.coords.latitude,pos.coords.longitude];
+  var g1=document.getElementById("gpsStat1"),g2=document.getElementById("gpsStat2");
+  var msg="내 위치 확인됨 · 위도 "+ll[0].toFixed(4)+", 경도 "+ll[1].toFixed(4)+" (정확도 약 "+Math.round(pos.coords.accuracy)+"m)";
+  if(g1)g1.textContent=msg; if(g2)g2.textContent=msg;
+  if(typeof L!=="undefined"&&mapsReady){
+   if(!gpsMk1&&map1){gpsMk1=L.circleMarker(ll,{radius:10}).addTo(map1).bindPopup("내 현재 위치(GPS)");}
+   else if(gpsMk1)gpsMk1.setLatLng(ll);
+   if(!gpsMk2&&map2){gpsMk2=L.circleMarker(ll,{radius:10}).addTo(map2).bindPopup("내 현재 위치(GPS)");}
+   else if(gpsMk2)gpsMk2.setLatLng(ll);
+   if(!gpsFixed&&map1){map1.setView(ll,14);gpsFixed=true;}
+  } else { toast("내 위치를 확인했어요. 실제지도에서는 파란 점으로 표시됩니다"); }
+ },function(err){toast("위치를 가져오지 못했어요. 시연 모드로 보세요");gpsWatch=null;},{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
+}
+function startSim(){
+ if(simTimer){clearInterval(simTimer);simTimer=null;simP=null;updateCarOnMaps();toast("시연을 멈췄어요");syncSimBtns("▶ 차량 이동 시연");return;}
+ var begin=function(){
+   if(S.stage<3)setStage(3,"병원으로 출발했어요");
+   simP=carProgress();
+   toast("차량이 집에서 병원으로 이동합니다");
+   syncSimBtns("⏸ 시연 멈추기");
+   simTimer=setInterval(function(){
+    simP=Math.min(0.97,simP+0.02);
+    updateCarOnMaps();
+    if(simP>=0.97){clearInterval(simTimer);simTimer=null;syncSimBtns("▶ 차량 이동 시연");setStage(4,"김○○님이 병원에 도착했습니다");simP=null;updateCarOnMaps();}
+   },300);
+ };
+ if(!mapsReady && typeof L==="undefined"){ loadLeafletThenInit(false); }
+ begin();
+}
+function syncSimBtns(t){var a=document.getElementById("btnSim1"),b=document.getElementById("btnSim2");if(a)a.textContent=t;if(b)b.textContent=t;}
+</script>
+
+<!--ethos-badge--><div style="text-align:center;padding:16px 8px 20px;font:12px/1.6 -apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#9aa1a9">이 페이지는 <a href="https://ethos.ai.kr" target="_blank" rel="noopener" style="color:#8a919b;text-decoration:underline">에토스AI 코드</a>로 만들어졌습니다</div>
+</body>
+</html>
