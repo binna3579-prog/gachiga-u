@@ -88,6 +88,13 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
 #toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:14px;padding:13px 20px;font-size:16px;font-weight:700;display:none;z-index:200;max-width:90%;text-align:center}
 #pinModal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:150;align-items:center;justify-content:center;padding:20px}
 #pinModal.open{display:flex}
+#apptModal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:150;align-items:center;justify-content:center;padding:20px}
+#apptModal.open{display:flex}
+.apptbox{background:#fff;border-radius:22px;padding:26px 22px;max-width:420px;width:100%}
+.appt-row{margin:10px 0;text-align:left}
+.appt-row label{display:block;font-size:15px;font-weight:800;margin-bottom:6px}
+.appt-row select,.appt-row input{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:13px;font-size:18px;background:#fff}
+#apptConfirm{display:none;background:#FFF6D9;border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
 .pinbox{background:#fff;border-radius:22px;padding:26px 22px;max-width:380px;width:100%;text-align:center}
 .pinbox input{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:15px;font-size:22px;text-align:center;letter-spacing:8px;margin:12px 0}
 .small{font-size:14px;color:var(--sub)}
@@ -138,6 +145,7 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
         <div class="kv" id="homeStatus"><b>&#128663; 차량이 준비되었어요.</b><br><span class="muted">차량 도착 예정 오전 10:05 · 휠체어 전용 차량</span></div>
         <button type="button" class="bigbtn btn-y" id="btnMyMove" style="margin-top:10px">내 이동 확인</button>
         <button type="button" class="bigbtn btn-soft" id="btnTell" style="margin-top:10px">보호자에게 알려주기</button>
+        <p class="small" style="margin-top:8px">문자 앱으로 연결됩니다. (시제품 예시 번호 010-0000-0000, 실제 번호로 교체 필요)</p>
       </div>
       <div id="homeGuard" style="display:none">
         <div style="font-size:34px">&#128106;</div>
@@ -210,6 +218,15 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
       <div class="steps" id="gSteps"></div>
       <div class="treat" id="gTreat" style="display:none"><b>진료가 완료되었어요.</b><br>정형외과 · 다음 진료 10월 15일(수) 10:30<br>안내: 무릎 상태 확인, 다음 방문 시 보호자 동행 권장 <span class="small">(가상 데이터·동의 전제)</span></div>
     </div>
+    <div class="card">
+      <h3>진료 예약 변경 · 취소 (보호자용)</h3>
+      <p class="muted">보호자가 진료 예약을 바꾸거나 취소할 수 있어요. 저장하면 홈·이동 화면과 알림에 함께 반영됩니다.</p>
+      <div class="kv" id="apptInfo"><b>일정을 불러오는 중이에요.</b></div>
+      <div class="row">
+        <button type="button" class="bigbtn btn-y" id="btnApptOpen" style="flex:1">진료시간 변경 / 취소</button>
+      </div>
+      <p class="small" style="margin-top:8px">변경·취소 내용은 이 기기 브라우저에만 저장됩니다.</p>
+    </div>
   </div>
 
   <!-- 알림 -->
@@ -277,23 +294,15 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
     </div>
     <!-- 대시보드 -->
     <div id="atab-dash">
-      <div class="adm-card"><h2>오늘의 외래 이동 관리</h2><p class="muted">충남대학교병원 · 9월 17일(목) · 진료만 등록하면 이동이 자동 연결됩니다.</p>
+      <div class="adm-card"><h2>오늘의 외래 이동 관리</h2><p class="muted">충남대학교병원 · 9월 17일(목) · 보호자가 진료시간을 바꾸거나 취소하면 알림에 자동 기록됩니다.</p>
         <div class="stat4" style="margin-top:12px">
           <div class="stat" style="background:var(--y-soft)"><div class="n" style="color:var(--ink)">24</div><div class="l" style="color:var(--sub)">오늘 진료 예정</div></div>
           <div class="stat" style="background:#EFF1F3"><div class="n" style="color:var(--ink)">18</div><div class="l" style="color:var(--sub)">이동 자동 연결</div></div>
           <div class="stat"><div class="n" id="statMoving">5</div><div class="l">이동 중</div></div>
           <div class="stat"><div class="n" id="statDone">13</div><div class="l">도착 완료</div></div>
         </div>
-        <button type="button" class="bigbtn btn-y" id="btnRegister">김○○님 외래 진료 등록하기 (자동 연결 시연)</button>
-        <div class="auto" id="autoflow">
-          <div class="a-step">&#9679; 외래 일정이 등록되었습니다.</div>
-          <div class="a-step">&#9679; 환자 상태를 분석하고 있습니다.</div>
-          <div class="a-step">&#9679; 맞춤 이동수단을 찾고 있습니다.</div>
-          <div class="a-step">&#9679; 차량이 자동으로 배정되었습니다.</div>
-          <div class="a-step">&#9679; 동행 매니저가 매칭되었습니다.</div>
-          <div class="a-step">&#9679; 이동 준비 완료</div>
-          <div class="abar"><i id="autobar"></i></div>
-        </div>
+        <!-- 구 등록 버튼 자리 (삭제됨) -->
+        <!-- 구 시연 애니메이션 자리 (삭제됨) -->
       </div>
       <div class="adm-card"><h3>환자 리스트</h3><div id="ptList"></div></div>
     </div>
@@ -335,11 +344,74 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14
   <button type="button" class="bigbtn btn-line" id="pinCancel" style="margin-top:8px">닫기</button>
 </div></div>
 
+<!-- 보호자 진료시간 변경·취소 -->
+<div id="apptModal" role="dialog" aria-modal="true" aria-label="진료시간 변경 및 취소">
+  <div class="apptbox">
+    <div style="font-size:15px;font-weight:800;color:var(--sub)">보호자 전용</div>
+    <h2 style="font-size:24px;margin:4px 0">진료시간 변경 / 취소</h2>
+    <p class="muted" id="apptNow">현재 일정: -</p>
+    <div class="appt-row"><label for="apptDate">진료 날짜</label><input type="date" id="apptDate"></div>
+    <div class="appt-row"><label for="apptTime">진료 시간</label><select id="apptTime"><option value="">시간 선택</option><option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option><option>13:00</option><option>13:30</option><option>14:00</option><option>14:30</option><option>15:00</option></select></div>
+    <div class="appt-row"><label for="apptDept">진료과</label><select id="apptDept"><option>정형외과</option><option>재활의학과</option><option>내과</option><option>신경과</option><option>안과</option></select></div>
+    <p class="small" id="apptMsg" style="display:none"></p>
+    <button type="button" class="bigbtn btn-y" id="btnApptSave">이 시간으로 변경하기</button>
+    <button type="button" class="bigbtn btn-line" id="btnApptCancel" style="margin-top:8px">진료 취소하기</button>
+    <div id="apptConfirm"><b>정말 취소할까요?</b><p class="small">취소해도 기록은 알림에 남습니다. 다시 변경하면 예약을 살릴 수 있어요.</p><div class="row"><button type="button" class="bigbtn btn-y" id="btnApptYes" style="flex:1">네, 취소할게요</button><button type="button" class="bigbtn btn-line" id="btnApptNo" style="flex:1">아니요</button></div></div>
+    <button type="button" class="bigbtn btn-soft" id="btnApptClose" style="margin-top:8px">닫기</button>
+  </div>
+</div>
+
 <script>
 window.addEventListener("error",function(e){try{var m="화면에 문제가 생겼어요. 새로고침 후 다시 눌러주세요.";var t=document.getElementById("toast");if(t){t.textContent=m;t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none"},2500);}}catch(_){}});
-function safeBind(id,fn){try{var el=document.getElementById(id);if(!el){return false;}el.onclick=fn;return true;}catch(e){return false;}}
-document.addEventListener("click",function(e){try{var b=e.target&&e.target.closest?e.target.closest("button"):null;if(!b)return;var id=b.id||"";if(id==="btnReal1"||id==="btnReal2"){e.stopPropagation();try{toast("실제지도를 불러오는 중입니다…");}catch(_){}try{loadLeafletThenInit(true);}catch(_){}setTimeout(function(){try{refreshMapSize();}catch(_){}},600);}}catch(_){}},true);
-var S={tab:"home",who:"me",stage:2,fb:null,sel:0,unread:1,notifs:[
+function safeBind(id,fn){try{var el=document.getElementById(id);if(!el){return false;}el.onclick=fn;el._bd=1;return true;}catch(e){return false;}}
+
+
+/* 만능 백업 위임: 직접 바인딩이 누락된 버튼만 처리 (중복 실행 방지) */
+document.addEventListener("click",function(e){
+ try{
+  var b=e.target&&e.target.closest?e.target.closest("button"):null;if(!b)return;
+  if(b.onclick||b._bd)return; /* 이미 직접 바인딩됨 -> 아무것도 안 함 */
+  var id=b.id||"", done=false;
+  var fire=function(fn){try{fn();done=true;}catch(_){}};
+  if(b.dataset&&b.dataset.tab){fire(function(){setTab(b.dataset.tab);});}
+  else if(b.dataset&&b.dataset.who){fire(function(){b.click&&0;});}
+  else if(b.dataset&&b.dataset.atab){fire(function(){
+    document.querySelectorAll(".adm-nav button").forEach(function(x){x.classList.remove("on")});b.classList.add("on");
+    var at={dash:document.getElementById("atab-dash"),pts:document.getElementById("atab-pts"),move:document.getElementById("atab-move"),fb:document.getElementById("atab-fb")};
+    Object.keys(at).forEach(function(k){if(at[k])at[k].style.display=b.dataset.atab===k?"block":"none";});});}
+  else if(b.dataset&&b.dataset.fb){fire(function(){
+    document.querySelectorAll(".fbemo").forEach(function(x){x.classList.remove("on")});b.classList.add("on");S.fb=b.dataset.fb;});}
+  else if(b.dataset&&b.dataset.retry){fire(function(){loadLeafletThenInit(true);});}
+  else if(id==="bellBtn"){fire(function(){S.unread=0;try{saveState();}catch(_){}setTab("alerts");});}
+  else if(id==="btnMyMove"){fire(function(){setStage(3,"병원으로 출발했어요");setTab("move");});}
+  else if(id==="btnTell"){fire(function(){try{window.location.href="sms:010-0000-0000?body="+encodeURIComponent("가치가U 이동 상황 - "+T[S.stage]);}catch(_){}toast("보호자에게 이동 상황을 보냈어요");});}
+  else if(id==="btnGoGuard"){fire(function(){setTab("guardian");});}
+  else if(id==="btnGoMove2"){fire(function(){setTab("move");});}
+  else if(id==="btnGoFb"||id==="btnGoFb2"){fire(function(){setTab("feedback");});}
+  else if(id==="btnGps1"||id==="btnGps2"){fire(function(){startGps();});}
+  else if(id==="btnReal1"||id==="btnReal2"){fire(function(){toast("실제지도를 불러오는 중입니다…");loadLeafletThenInit(true);});}
+  else if(id==="btnSim1"||id==="btnSim2"){fire(function(){startSim();});}
+  else if(id==="btnCall"){fire(function(){toast("기사 김○○님께 연결합니다 (시제품 예시 번호)");try{window.location.href="tel:010-1234-5678";}catch(_){}});}
+  else if(id==="btnMgr"){fire(function(){toast("동행 매니저 이○○님을 불렀어요 (시제품 예시 번호)");try{window.location.href="tel:010-8765-4321";}catch(_){}});}
+
+  else if(id==="btnArrived"){fire(function(){setStage(4,"김○○님이 병원에 도착했습니다");});}
+  else if(id==="btnComplete"){fire(function(){setStage(5,"진료가 완료되었습니다. 보호자에게 알려드렸어요");});}
+  else if(id==="btnReturn"){fire(function(){setStage(6,"귀가 차량이 준비되었어요");});}
+  else if(id==="nextStepBtn"){fire(function(){var n=(S.stage+1)%7;setStage(n);});}
+  else if(id==="btnFb"){fire(function(){var f=document.getElementById("btnFb");if(f&&f.onclick&&f.onclick!==null){}else{toast("의견 보내기 버튼을 눌러주세요");}});}
+  else if(id==="btnAdmClose"){fire(function(){closeAdmin();});}
+  else if(id==="pinOk"){fire(function(){var v=document.getElementById("pinInput").value.trim();if(v==="1234"){closePin();openAdmin();}else{toast("번호가 맞지 않아요");}});}
+  else if(id==="pinCancel"){fire(function(){closePin();});}
+  else if(id==="btnApptOpen"){fire(function(){openAppt();});}
+  else if(id==="btnApptClose"){fire(function(){closeAppt();});}
+  else if(id==="btnApptSave"){fire(function(){toast("처리 중이에요");});}
+  else if(id==="btnApptCancel"||id==="btnApptYes"||id==="btnApptNo"){fire(function(){toast("예약 창에서 다시 눌러주세요");});}
+  else if(id==="verLine"){fire(function(){});}
+  if(done){try{e.stopPropagation();}catch(_){}}
+ }catch(_){}
+},false);
+
+var S={tab:"home",who:"me",stage:2,fb:null,sel:0,unread:1,appt:{date:"2026-09-19",time:"10:30",dept:"정형외과",status:"예약됨"},notifs:[
  {t:"차량이 준비되었어요",d:"휠체어 전용 차량 · 도착 예정 10:05",at:"오늘 오전 9:40"},
  {t:"외래 일정이 등록되었습니다",d:"정형외과 10:30 · 이동 자동 연결 시작",at:"오늘 오전 9:38"}],
  patients:[
@@ -356,7 +428,7 @@ var D=["진료 등록을 기다리고 있어요","환자 상태를 분석하고 
 var PMS=["차량 준비","차량 도착","이동 중","병원 도착","진료 완료","귀가"];
 function toast(m){var e=document.getElementById("toast");e.textContent=m;e.style.display="block";clearTimeout(e._t);e._t=setTimeout(function(){e.style.display="none"},2200)}
 function tabFromHash(){var h=(location.hash||"").replace(/^#\/?/,"");if(["home","move","guardian","alerts","my","feedback"].indexOf(h)>=0)return h;return "home"}
-function setTab(t){S.tab=t;try{if(location.hash!=="#/"+t){location.hash="/"+t;}}catch(e){try{location.hash="/"+t;}catch(e2){}}render();try{bindRealBtns();}catch(e){}try{loadLeafletThenInit(false);}catch(e){}try{refreshMapSize();}catch(e){}setTimeout(function(){try{bindRealBtns();}catch(e){}try{refreshMapSize();}catch(e){}},500);setTimeout(function(){try{refreshMapSize();}catch(e){}try{forceDaejeon(map1);}catch(e){}try{forceDaejeon(map2);}catch(e){}},1300);}
+function setTab(t){try{if(typeof _scr!=="undefined"&&_scr){_scr[S.tab]=window.scrollY||0;}}catch(e){}S.tab=t;try{if(location.hash!=="#/"+t){location.hash="/"+t;}}catch(e){try{location.hash="/"+t;}catch(e2){}}render();try{bindRealBtns();}catch(e){}try{loadLeafletThenInit(false);}catch(e){}try{refreshMapSize();}catch(e){}setTimeout(function(){try{bindRealBtns();}catch(e){}try{refreshMapSize();}catch(e){}},500);setTimeout(function(){try{refreshMapSize();}catch(e){}try{forceDaejeon(map1);}catch(e){}try{forceDaejeon(map2);}catch(e){}},1300);try{var _ry=(_scr&&_scr[t])||0;setTimeout(function(){try{window.scrollTo(0,_ry);}catch(e){}},60);}catch(e){}}
 function render(){var views={home:document.getElementById("view-home"),move:document.getElementById("view-move"),guardian:document.getElementById("view-guardian"),alerts:document.getElementById("view-alerts"),my:document.getElementById("view-my"),feedback:document.getElementById("view-feedback")};Object.keys(views).forEach(function(v){views[v].classList.toggle("show",S.tab===v)});
  document.querySelectorAll(".navbtn").forEach(function(b){b.classList.toggle("on",b.dataset.tab===S.tab)});
  document.getElementById("bellDot").style.display=S.unread>0?"block":"none";
@@ -382,7 +454,7 @@ function updateTexts(){var i=S.stage;
  document.getElementById("heroHi").innerHTML=(S.tab==="guardian"?"보호자님, 안녕하세요.<small>김○○님의 이동을 함께 지켜봐 주세요.</small>":"안녕하세요, 김○○님<small>오늘 병원 가는 날이에요. 차량은 저희가 준비했어요.</small>");
  S.patients[0].st=T[Math.max(2,i)];S.patients[0].cls=i>=4?"done":(i>=2?"moving":"");
  renderPatients();syncDetail();
- var nl=document.getElementById("notifList");nl.innerHTML="";S.notifs.slice().reverse().forEach(function(n){var d=document.createElement("div");d.className="kv";d.innerHTML="<b>"+esc(n.t)+"</b><br><span class='muted'>"+esc(n.d)+" · "+esc(n.at)+"</span>";nl.appendChild(d)});
+ var nl=document.getElementById("notifList");nl.innerHTML="";if(!S.notifs.length){nl.innerHTML='<p class="muted">아직 알림이 없습니다. 이동 상황이 바뀌면 여기에 알려드려요.</p>';}else{S.notifs.slice().reverse().forEach(function(n){var d=document.createElement("div");d.className="kv";d.innerHTML="<b>"+esc(n.t)+"</b><br><span class='muted'>"+esc(n.d)+" · "+esc(n.at)+"</span>";nl.appendChild(d)})};
  var mm=document.getElementById("monMsg");if(mm)mm.textContent=T[i]+". "+D[i];
  var sm=["외래 진료 등록 화면입니다","분석 중이에요","차량 배정 완료","환자 앱 확인","이동 중","보호자 확인 · 병원 도착","진료 완료 · 귀가"];
  document.getElementById("stepLabel").textContent="STEP "+Math.min(11,Math.max(1,i+1))+"/11 · "+sm[Math.min(6,i)];
@@ -400,50 +472,64 @@ function openPin(){document.getElementById("pinModal").classList.add("open");set
 function closePin(){document.getElementById("pinModal").classList.remove("open")}
 function openAdmin(){document.getElementById("adminOverlay").classList.add("open");renderFb()}
 function closeAdmin(){document.getElementById("adminOverlay").classList.remove("open");if(location.hash==="#/admin"){try{history.replaceState(null,"","#/"+S.tab)}catch(e){}}}
-document.getElementById("verLine").onclick=function(){var n=Date.now();if(n-tapT>2000)tapN=0;tapT=n;tapN++;if(tapN>=5){tapN=0;openPin()}else if(tapN===3)toast("관리자 메뉴는 숨겨져 있어요")};
-var pressT=null;var logo=document.getElementById("logo");
-logo.addEventListener("touchstart",function(){pressT=setTimeout(openPin,1500)});logo.addEventListener("touchend",function(){clearTimeout(pressT)});
-logo.addEventListener("mousedown",function(){pressT=setTimeout(openPin,1500)});logo.addEventListener("mouseup",function(){clearTimeout(pressT)});
-document.getElementById("pinOk").onclick=function(){var v=document.getElementById("pinInput").value.trim();if(v==="1234"){closePin();openAdmin();toast("관리자 모드로 들어갔어요")}else{toast("번호가 맞지 않아요")}}; 
-document.getElementById("pinCancel").onclick=closePin;
-document.getElementById("btnAdmClose").onclick=closeAdmin;
+safeBind("verLine",function(){var n=Date.now();if(n-tapT>2000)tapN=0;tapT=n;tapN++;if(tapN>=5){tapN=0;openPin()}else if(tapN===3)toast("관리자 메뉴는 숨겨져 있어요")});
+var pressT=null;var logo=document.getElementById("logo");try{if(!logo){throw 0;}}catch(e){}
+try{if(logo){logo.addEventListener("touchstart",function(){pressT=setTimeout(openPin,1500)});logo.addEventListener("touchend",function(){clearTimeout(pressT)});
+logo.addEventListener("mousedown",function(){pressT=setTimeout(openPin,1500)});logo.addEventListener("mouseup",function(){clearTimeout(pressT)});}}catch(e){}
+safeBind("pinOk",function(){var v=document.getElementById("pinInput").value.trim();if(v==="1234"){closePin();openAdmin();toast("관리자 모드로 들어갔어요")}else{toast("번호가 맞지 않아요")}}); 
+safeBind("pinCancel",closePin);
+safeBind("btnAdmClose",closeAdmin);
 /* 내비·버튼 */
 var _scr={};document.querySelectorAll(".navbtn").forEach(function(b){b.onclick=function(){try{_scr[S.tab]=window.scrollY||0;}catch(e){}setTab(b.dataset.tab);try{var _y=_scr[b.dataset.tab]||0;setTimeout(function(){window.scrollTo(0,_y);},60);}catch(e){}}});
-document.getElementById("bellBtn").onclick=function(){S.unread=0;try{saveState();}catch(e){}setTab("alerts")};
-document.querySelectorAll("#whoSeg button").forEach(function(b){b.onclick=function(){document.querySelectorAll("#whoSeg button").forEach(function(x){x.classList.remove("on")});b.classList.add("on");var me=b.dataset.who==="me";document.getElementById("homeMe").style.display=me?"block":"none";document.getElementById("homeGuard").style.display=me?"none":"block"}});
-document.getElementById("btnMyMove").onclick=function(){setStage(3,"병원으로 출발했어요");setTab("move")};
-document.getElementById("btnTell").onclick=function(){try{window.location.href="sms:010-0000-0000?body="+encodeURIComponent("가치가U: 김○○님 이동 상황 - "+T[S.stage]+" ("+D[S.stage]+")");}catch(e){}toast("보호자에게 이동 상황을 보냈어요 (문자 앱이 열리면 전송을 눌러주세요)")};
-document.getElementById("btnGoGuard").onclick=function(){setTab("guardian")};
-document.getElementById("btnGoMove2").onclick=function(){setTab("move")};
-document.getElementById("btnGoFb").onclick=function(){setTab("feedback")};
-document.getElementById("btnGoFb2").onclick=function(){setTab("feedback")};
-document.getElementById("btnGps1").onclick=startGps;
-document.getElementById("btnGps2").onclick=startGps;
-try{document.getElementById("btnSim1").onclick=startSim;}catch(e){}
-try{document.getElementById("btnSim2").onclick=startSim;}catch(e){}
+safeBind("bellBtn",function(){S.unread=0;try{saveState();}catch(e){}setTab("alerts")});
+document.querySelectorAll("#whoSeg button").forEach(function(b){b.onclick=function(){document.querySelectorAll("#whoSeg button").forEach(function(x){x.classList.remove("on")});b.classList.add("on");var me=b.dataset.who==="me";S.who=b.dataset.who;document.getElementById("homeMe").style.display=me?"block":"none";document.getElementById("homeGuard").style.display=me?"none":"block";try{saveState();}catch(e){}}});
+safeBind("btnMyMove",function(){setStage(3,"병원으로 출발했어요");setTab("move")});
+safeBind("btnTell",function(){try{window.location.href="sms:010-0000-0000?body="+encodeURIComponent("가치가U: 김○○님 이동 상황 - "+T[S.stage]+" ("+D[S.stage]+")");}catch(e){}toast("보호자에게 이동 상황을 보냈어요 (문자 앱이 열리면 전송을 눌러주세요)")});
+safeBind("btnGoGuard",function(){setTab("guardian")});
+safeBind("btnGoMove2",function(){setTab("move")});
+safeBind("btnGoFb",function(){setTab("feedback")});
+safeBind("btnGoFb2",function(){setTab("feedback")});
+safeBind("btnGps1",startGps);
+safeBind("btnGps2",startGps);
+safeBind("btnSim1",startSim);
+safeBind("btnSim2",startSim);
 
 
 var _setTab=setTab;setTab=function(t){_setTab(t);setTimeout(refreshMapSize,150);};
-document.getElementById("btnCall").onclick=function(){toast("기사 김○○님께 연결합니다 (시제품 예시 번호)");try{window.location.href="tel:010-1234-5678";}catch(e){}};
-document.getElementById("btnMgr").onclick=function(){toast("동행 매니저 이○○님을 불렀어요 (시제품 예시 번호)");try{window.location.href="tel:010-8765-4321";}catch(e){}};
+safeBind("btnCall",function(){toast("기사 김○○님께 연결합니다 (시제품 예시 번호)");try{window.location.href="tel:010-1234-5678";}catch(e){}});
+safeBind("btnMgr",function(){toast("동행 매니저 이○○님을 불렀어요 (시제품 예시 번호)");try{window.location.href="tel:010-8765-4321";}catch(e){}});
 document.querySelectorAll(".adm-nav button").forEach(function(b){b.onclick=function(){document.querySelectorAll(".adm-nav button").forEach(function(x){x.classList.remove("on")});b.classList.add("on");(function(){var atabs={dash:document.getElementById("atab-dash"),pts:document.getElementById("atab-pts"),move:document.getElementById("atab-move"),fb:document.getElementById("atab-fb")};Object.keys(atabs).forEach(function(k){atabs[k].style.display=b.dataset.atab===k?"block":"none"})})()}});
-/* 자동 연결 시연 */
-var _regBusy=false;document.getElementById("btnRegister").onclick=function(){if(_regBusy){toast("자동 연결을 진행 중이에요");return}_regBusy=true;var _rb=document.getElementById("btnRegister");_rb.disabled=true;var f=document.getElementById("autoflow");f.classList.add("show");var steps=f.querySelectorAll(".a-step");steps.forEach(function(s){s.classList.remove("on","ok")});document.getElementById("autobar").style.width="0";var k=0;setStage(1,"외래 일정이 등록되었습니다");
- function tick(){if(k>0){steps[k-1].classList.remove("on");steps[k-1].classList.add("ok")}if(k>=steps.length){setStage(2,"이동 준비 완료! 환자 앱을 확인하세요");closeAdmin();setTab("home");_regBusy=false;_rb.disabled=false;return}steps[k].classList.add("on");document.getElementById("autobar").style.width=(k+1)/steps.length*100+"%";k++;setTimeout(tick,650)}tick()};
-document.getElementById("btnArrived").onclick=function(){setStage(4,"김○○님이 병원에 도착했습니다")};
-document.getElementById("btnComplete").onclick=function(){setStage(5,"진료가 완료되었습니다. 보호자에게 알려드렸어요")};
-document.getElementById("btnReturn").onclick=function(){setStage(6,"귀가 차량이 준비되었어요")};
-document.getElementById("nextStepBtn").onclick=function(){var n=(S.stage+1)%7;setStage(n);if(n===2){} if(n===3&&!document.getElementById("adminOverlay").classList.contains("open"))setTab("move");if(n>=4&&n<=5&&!document.getElementById("adminOverlay").classList.contains("open"))setTab("guardian")};
+/* 보호자 예약 변경·취소 */
+/* 구 등록 JS 자리 (삭제됨) */
+
+safeBind("btnArrived",function(){setStage(4,"김○○님이 병원에 도착했습니다")});
+safeBind("btnComplete",function(){setStage(5,"진료가 완료되었습니다. 보호자에게 알려드렸어요")});
+safeBind("btnReturn",function(){setStage(6,"귀가 차량이 준비되었어요")});
+safeBind("nextStepBtn",function(){var n=(S.stage+1)%7;setStage(n);if(n===2){} if(n===3&&!document.getElementById("adminOverlay").classList.contains("open"))setTab("move");if(n>=4&&n<=5&&!document.getElementById("adminOverlay").classList.contains("open"))setTab("guardian")});
 /* 피드백 */
 document.querySelectorAll(".fbemo").forEach(function(b){b.onclick=function(){document.querySelectorAll(".fbemo").forEach(function(x){x.classList.remove("on")});b.classList.add("on");S.fb=b.dataset.fb}});
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 function loadFb(){try{var v=JSON.parse(localStorage.getItem("gachiga_fb")||"[]");return Array.isArray(v)?v:[]}catch(e){return[]}}
 function renderFb(){var a=loadFb();document.getElementById("fbCount").textContent=a.length;var w=document.getElementById("fbList");if(!w)return;if(!a.length){w.innerHTML='<p class="muted">아직 의견이 없습니다.</p>';return}w.innerHTML="";a.slice().reverse().forEach(function(f){var d=document.createElement("div");d.className="kv";var b=document.createElement("b");b.textContent=f.mood||"의견";d.appendChild(b);d.appendChild(document.createTextNode(" · "+(f.cat||"기타")));d.appendChild(document.createElement("br"));d.appendChild(document.createTextNode(f.text||""));d.appendChild(document.createElement("br"));var sp=document.createElement("span");sp.className="small";sp.textContent=f.at||"";d.appendChild(sp);w.appendChild(d)})}
-var _fbBusy=false;document.getElementById("btnFb").onclick=function(){if(_fbBusy){toast("의견을 보내는 중이에요. 잠시만 기다려주세요");return}var t=document.getElementById("fbText").value.trim();if(!S.fb){toast("위에서 좋아요·보통이에요·불편해요 중 하나를 골라주세요");return}if(!t){toast("의견을 한 줄이라도 적어주세요");return}if(t.length>500){toast("의견은 500자 이내로 적어주세요");return}var btn=document.getElementById("btnFb");var a=loadFb();var now=Date.now();var dup=a.some(function(f){return f.text===t&&(now-(f.ts||0))<10000});if(dup){toast("방금 같은 의견을 보냈어요. 잠시 후 다시 시도해주세요");return}_fbBusy=true;btn.disabled=true;try{a.push({mood:S.fb,cat:document.getElementById("fbCat").value.trim()||"기타",text:t,at:new Date().toLocaleString("ko-KR"),ts:now});localStorage.setItem("gachiga_fb",JSON.stringify(a));}catch(e){toast("저장에 실패했어요. 저장 공간을 확인 후 다시 시도해주세요");_fbBusy=false;btn.disabled=false;return}document.getElementById("fbText").value="";renderFb();toast("의견을 보내주셔서 감사합니다");setTimeout(function(){_fbBusy=false;btn.disabled=false},1500)};
+var _fbBusy=false;safeBind("btnFb",function(){if(_fbBusy){toast("의견을 보내는 중이에요. 잠시만 기다려주세요");return}var t=document.getElementById("fbText").value.trim();if(!S.fb){toast("위에서 좋아요·보통이에요·불편해요 중 하나를 골라주세요");return}if(!t){toast("의견을 한 줄이라도 적어주세요");return}if(t.length>500){toast("의견은 500자 이내로 적어주세요");return}var btn=document.getElementById("btnFb");var a=loadFb();var now=Date.now();var dup=a.some(function(f){return f.text===t&&(now-(f.ts||0))<10000});if(dup){toast("방금 같은 의견을 보냈어요. 잠시 후 다시 시도해주세요");return}_fbBusy=true;btn.disabled=true;try{a.push({mood:S.fb,cat:document.getElementById("fbCat").value.trim()||"기타",text:t,at:new Date().toLocaleString("ko-KR"),ts:now});localStorage.setItem("gachiga_fb",JSON.stringify(a));}catch(e){toast("저장에 실패했어요. 저장 공간을 확인 후 다시 시도해주세요");_fbBusy=false;btn.disabled=false;return}document.getElementById("fbText").value="";try{localStorage.removeItem("gachiga_draft");}catch(e){}renderFb();toast("의견을 보내주셔서 감사합니다");setTimeout(function(){_fbBusy=false;btn.disabled=false},1500)});
+var _apptBusy=false;
+safeBind("btnApptOpen",function(){openAppt();});
+safeBind("btnApptClose",function(){closeAppt();});
+safeBind("btnApptNo",function(){var c=document.getElementById("apptConfirm");if(c)c.style.display="none";});
+safeBind("btnApptCancel",function(){var c=document.getElementById("apptConfirm");if(c)c.style.display="block";hideApptMsg();showApptMsg("취소하려면 아래에서 다시 한 번 눌러주세요.",false);});
+safeBind("btnApptYes",function(){if(_apptBusy)return;_apptBusy=true;var b=document.getElementById("btnApptYes");if(b)b.disabled=true;try{S.appt.status="취소됨";pushNotif("진료가 취소되었어요",S.appt.dept+" "+S.appt.date+" "+S.appt.time+" · 보호자가 취소함");render();try{renderAppt();}catch(e){}try{saveState();}catch(e){}showApptMsg("취소가 기록되었어요. 알림에서 확인할 수 있습니다.",true);var c=document.getElementById("apptConfirm");if(c)c.style.display="none";toast("진료 예약을 취소했어요. 알림에 기록되었습니다");}finally{setTimeout(function(){_apptBusy=false;var bb=document.getElementById("btnApptYes");if(bb)bb.disabled=false;},1200);}});
+safeBind("btnApptSave",function(){if(_apptBusy){toast("처리 중이에요. 잠시만 기다려주세요");return;}hideApptMsg();var d=(document.getElementById("apptDate").value||"").trim();var t=(document.getElementById("apptTime").value||"").trim();var dp=(document.getElementById("apptDept").value||"").trim()||"정형외과";if(!d){showApptMsg("진료 날짜를 선택해 주세요.",false);return;}if(!t){showApptMsg("진료 시간을 선택해 주세요.",false);return;}if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){showApptMsg("날짜 형식이 올바르지 않아요. 달력에서 다시 선택해 주세요.",false);return;}if(d<new Date().toISOString().slice(0,10)){showApptMsg("지난 날짜는 선택할 수 없어요. 오늘 이후 날짜를 골라주세요.",false);return;}_apptBusy=true;var b=document.getElementById("btnApptSave");if(b)b.disabled=true;try{var was=S.appt.status==="취소됨"?" (취소 건 다시 예약)":"";S.appt={date:d,time:t,dept:dp,status:"예약됨"};pushNotif("진료시간이 변경되었어요",dp+" "+d+" "+t+was);render();try{renderAppt();}catch(e){}try{saveState();}catch(e){}showApptMsg("변경되었어요: "+d+" "+t+" · "+dp+was,true);toast("진료시간이 변경되었어요");}finally{setTimeout(function(){_apptBusy=false;var bb=document.getElementById("btnApptSave");if(bb)bb.disabled=false;},1200);}});
+
+var _oldRender=render;render=function(){try{_oldRender();}catch(e){}try{renderAppt();}catch(e){}try{var _d=JSON.parse(localStorage.getItem("gachiga_draft")||"null");if(_d&&_d.text){var _t=document.getElementById("fbText");if(_t&&!_t.value)_t.value=_d.text;}}catch(e){}};
 window.addEventListener("hashchange",function(){if(location.hash==="#/admin"){openPin();return}var _known=["home","move","guardian","alerts","my","feedback"];var _h=(location.hash||"").replace(/^#\/?/,"");if(_h&&_h!=="admin"&&_known.indexOf(_h)<0){try{history.replaceState(null,"","#/home");}catch(e){location.hash="#/home";}S.tab="home";render();saveState();return}var t=tabFromHash();if(t!==S.tab){S.tab=t;render();}saveState();});
-function saveState(){try{localStorage.setItem("gachiga_state",JSON.stringify({stage:S.stage,tab:S.tab,sel:S.sel,unread:S.unread,notifs:S.notifs.slice(-20)}));}catch(e){}}
-function loadState(){try{var s=JSON.parse(localStorage.getItem("gachiga_state")||"null");if(!s)return;if(typeof s.stage==="number")S.stage=Math.max(0,Math.min(6,s.stage));if(typeof s.sel==="number")S.sel=s.sel;if(typeof s.unread==="number")S.unread=s.unread;if(Array.isArray(s.notifs)&&s.notifs.length)S.notifs=s.notifs;}catch(e){}}
-(function(){try{if(location.hash==="#/admin"){openPin()}}catch(e){}try{loadState();}catch(e){}var t="home";try{t=tabFromHash();}catch(e){}S.tab=t;try{var _h0=(location.hash||"").replace(/^#\/?/,"");if(_h0&&_h0!=="admin"&&["home","move","guardian","alerts","my","feedback"].indexOf(_h0)<0){history.replaceState(null,"","#/home");}S.tab=t;}catch(e){}try{render();}catch(e){}try{renderPatients();}catch(e){}try{syncDetail();}catch(e){}try{renderFb();}catch(e){}try{bindRealBtns();}catch(e){}setTimeout(function(){try{initMaps();}catch(e){}try{bindRealBtns();}catch(e){}try{refreshMapSize();}catch(e){}},400)})();
+function saveState(){try{localStorage.setItem("gachiga_state",JSON.stringify({stage:S.stage,tab:S.tab,sel:S.sel,unread:S.unread,notifs:S.notifs.slice(-20),appt:S.appt||null,who:S.who||"me"}));}catch(e){}}
+function renderAppt(){try{var a=S.appt||{date:"2026-09-19",time:"10:30",dept:"정형외과",status:"예약됨"};var info=document.getElementById("apptInfo");var now=document.getElementById("apptNow");var label=a.status==="취소됨"?("취소됨 · "+a.dept+" (기존 "+a.date+" "+a.time+")"):(a.date+" "+a.time+" · "+a.dept+" · "+a.status);if(info){if(a.status==="취소됨"){info.innerHTML="<b>예약이 취소되었어요.</b><br><span class='muted'>"+esc(a.dept)+" · 기존 일정 "+esc(a.date)+" "+esc(a.time)+" · 다시 변경하면 예약을 살릴 수 있어요</span>";}else{info.innerHTML="<b>"+esc(a.date)+" "+esc(a.time)+" · "+esc(a.dept)+"</b><br><span class='muted'>상태: "+esc(a.status)+" · 변경하면 알림에 자동 기록됩니다</span>";}}if(now){now.textContent="현재 일정: "+label;}var d=document.getElementById("apptDate");var t=document.getElementById("apptTime");var dp=document.getElementById("apptDept");if(d&&a.date&&document.activeElement!==d)d.value=a.date;if(t&&a.time&&document.activeElement!==t)t.value=a.time;if(dp&&a.dept&&document.activeElement!==dp)dp.value=a.dept;try{var st=S.stage;var eta=document.getElementById("pEta");if(eta){if(a.status==="취소됨"){eta.textContent="진료가 취소되었어요 · 다시 예약하면 이동이 연결됩니다";}else{eta.textContent=D[st]+" · 충남대학교병원 "+a.dept+" "+a.time;}}}catch(e){}try{var hm=document.querySelector("#homeMe .muted");if(hm){if(a.status==="취소됨"){hm.textContent="충남대학교병원 · "+a.dept+" · 취소됨 (다시 예약해 주세요)";}else{hm.textContent="충남대학교병원 · "+a.dept+" · "+a.time;}}}catch(e){}try{if(S.patients&&S.patients[0]){S.patients[0].dept=a.dept;S.patients[0].time=a.status==="취소됨"?(a.time+" (취소됨)"):a.time;}}catch(e){}}catch(e){}}
+function showApptMsg(m,ok){var e=document.getElementById("apptMsg");if(!e)return;e.style.display="block";e.style.color=ok?"#1B7A3D":"#B3261E";e.style.fontWeight="800";e.textContent=m;}
+function hideApptMsg(){var e=document.getElementById("apptMsg");if(e)e.style.display="none";}
+function openAppt(){try{renderAppt();}catch(e){}try{hideApptMsg();}catch(e){}try{var c=document.getElementById("apptConfirm");if(c)c.style.display="none";}catch(e){}document.getElementById("apptModal").classList.add("open");setTimeout(function(){try{document.getElementById("apptDate").focus();}catch(e){}},100);}
+function closeAppt(){document.getElementById("apptModal").classList.remove("open");}
+function loadState(){try{var s=JSON.parse(localStorage.getItem("gachiga_state")||"null");if(!s)return;if(typeof s.stage==="number")S.stage=Math.max(0,Math.min(6,s.stage));if(typeof s.sel==="number")S.sel=Math.max(0,Math.min(S.patients.length-1,s.sel));if(typeof s.unread==="number")S.unread=s.unread;if(s.who==="me"||s.who==="guard")S.who=s.who;if(Array.isArray(s.notifs)&&s.notifs.length)S.notifs=s.notifs;if(s.appt&&typeof s.appt==="object"){S.appt={date:String(s.appt.date||"2026-09-19"),time:String(s.appt.time||"10:30"),dept:String(s.appt.dept||"정형외과"),status:String(s.appt.status||"예약됨")};}}catch(e){}}
+(function(){try{if(location.hash==="#/admin"){openPin()}}catch(e){}try{loadState();}catch(e){}try{loadDraft();}catch(e){}var t="home";try{t=tabFromHash();}catch(e){}S.tab=t;try{var _h0=(location.hash||"").replace(/^#\/?/,"");if(_h0&&_h0!=="admin"&&["home","move","guardian","alerts","my","feedback"].indexOf(_h0)<0){history.replaceState(null,"","#/home");}S.tab=t;}catch(e){}try{var _me=(S.who||"me")==="me";var _wb=document.querySelectorAll("#whoSeg button");if(_wb&&_wb.length){for(var _wi=0;_wi<_wb.length;_wi++){var _isMe=_wb[_wi].dataset.who==="me";if((_isMe&&_me)||(!_isMe&&!_me))_wb[_wi].classList.add("on");else _wb[_wi].classList.remove("on");}}var _hm=document.getElementById("homeMe"),_hg=document.getElementById("homeGuard");if(_hm&&_hg){_hm.style.display=_me?"block":"none";_hg.style.display=_me?"none":"block";}}catch(e){}try{render();}catch(e){}try{renderPatients();}catch(e){}try{syncDetail();}catch(e){}try{renderFb();}catch(e){}try{bindRealBtns();}catch(e){}setTimeout(function(){try{initMaps();}catch(e){}try{bindRealBtns();}catch(e){}try{refreshMapSize();}catch(e){}},400)})();
 
 /* ===== 진짜 지도 (Leaflet + OpenStreetMap) + 차단환경 폴백 약도 + GPS ===== */
 var HOME_LL=[36.3510,127.3780];
@@ -664,8 +750,18 @@ function bindRealBtns(){
 function syncSimBtns(t){try{bindRealBtns();}catch(e){}}
 setTimeout(function(){try{if(!mapsReady)loadLeafletThenInit(false);}catch(e){}},1500);
 setTimeout(function(){try{if(!mapsReady)loadLeafletThenInit(false);}catch(e){}try{refreshMapSize();}catch(e){}},4000);
-if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){try{bindRealBtns();}catch(e){}try{refreshMapSize();}catch(e){}});}else{try{bindRealBtns();}catch(e){}}
+try{bindRealBtns();}catch(e){}
+
+/* 검수fix: 피드백 입력 중 값 유지 (탭 이동·새로고침해도 유지) */
+function saveDraft(){try{var t=document.getElementById("fbText");var c=document.getElementById("fbCat");localStorage.setItem("gachiga_draft",JSON.stringify({text:t?(t.value||""):"",cat:c?(c.value||""):"",mood:S.fb||null}));}catch(e){}}
+function loadDraft(){try{var d=JSON.parse(localStorage.getItem("gachiga_draft")||"null");if(!d)return;var t=document.getElementById("fbText");var c=document.getElementById("fbCat");if(t&&typeof d.text==="string")t.value=d.text;if(c&&d.cat)c.value=d.cat;if(d.mood){S.fb=d.mood;document.querySelectorAll(".fbemo").forEach(function(x){x.classList.toggle("on",x.dataset.fb===d.mood);});}}catch(e){}}
+try{document.addEventListener("input",function(e){try{if(e.target&&(e.target.id==="fbText"||e.target.id==="fbCat"))saveDraft();}catch(_){}});}catch(e){}
+try{document.addEventListener("change",function(e){try{if(e.target&&(e.target.id==="fbCat"))saveDraft();}catch(_){}});}catch(e){}
+try{var _oldSaveState2=saveState;saveState=function(){try{saveDraft();}catch(e){}return _oldSaveState2();};}catch(e){}
+
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){try{bindRealBtns();}catch(e){}try{refreshMapSize();}catch(e){}try{render();}catch(e){}});}else{try{refreshMapSize();}catch(e){}}
 </script>
+<!-- btn-fix 2026-09-18 -->
 
 <!--ethos-badge--><div style="text-align:center;padding:16px 8px 20px;font:12px/1.6 -apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#9aa1a9">이 페이지는 <a href="https://ethos.ai.kr" target="_blank" rel="noopener" style="color:#8a919b;text-decoration:underline">에토스AI 코드</a>로 만들어졌습니다</div>
 </body>
