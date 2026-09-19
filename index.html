@@ -43,7 +43,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sa
 .bottomnav button{flex:1;border:0;background:none;min-height:52px;font-size:12px;font-weight:800;color:var(--mut);border-radius:10px}
 .bottomnav button.on{background:var(--y2);color:var(--ink)}
 /* 토스트/모달 */
-#fbMood .ghostbtn.sel{background:var(--y);border-color:#E5B800;box-shadow:0 0 0 2px var(--y2);}#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom));background:#2B2110;color:#fff;padding:10px 14px;border-radius:12px;font-size:13px;display:none;z-index:99;max-width:90%;line-height:1.5}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom));background:#2B2110;color:#fff;padding:10px 14px;border-radius:12px;font-size:13px;display:none;z-index:99;max-width:90%;line-height:1.5}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;z-index:50;padding:16px}
 .modal.open{display:flex;align-items:center;justify-content:center}
 .sheet{background:#fff;border-radius:18px;padding:18px 14px;max-width:420px;width:100%;max-height:88vh;overflow:auto}
@@ -51,15 +51,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sa
 .sheet label{display:block;font-size:13px;font-weight:800;margin:10px 0 4px}
 .sheet input,.sheet select,.sheet textarea{width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:15px;background:#fff}
 .sheet textarea{min-height:90px;resize:vertical}
-.aimsgs{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto;background:#FFFDF4;border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px}
-.aimsg{max-width:88%;padding:9px 11px;border-radius:12px;font-size:14px;line-height:1.55;word-break:keep-all;white-space:pre-line}
-.aimsg.ai{background:#fff;border:1px solid var(--line);align-self:flex-start}
-.aimsg.me{background:var(--y);align-self:flex-end;font-weight:700}
-.aichips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.aichips button{flex:1 1 auto;min-height:44px;border:1px solid var(--line);background:#fff;border-radius:999px;font-size:13px;font-weight:800;padding:8px 10px;word-break:keep-all}
-.aiinputrow{display:flex;gap:6px;margin-top:8px}
-.aiinputrow input{flex:1;min-height:48px;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:15px}
-.aiinputrow button{flex:0 0 84px;min-height:48px;border:0;border-radius:12px;background:var(--y);font-weight:900;font-size:15px}
 .verline{text-align:center;font-size:11px;color:var(--mut);margin:18px 0 6px;user-select:none}
 #adminov{display:none;position:fixed;inset:0;background:#fff;z-index:60;overflow:auto;padding:16px}
 .ptlist{display:grid;gap:8px}
@@ -142,14 +133,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sa
         <button type="button" class="bigbtn" id="btnApptOpen">진료시간 변경 / 취소</button>
       </div>
       <p class="smallnote">변경·취소 내용은 이 기기 브라우저에만 저장됩니다.</p>
-    </div>
-    <div class="card">
-      <h2>못 함께 갔을 때 · 진료 내용 물어보기</h2>
-      <p class="smallnote">보호자가 함께 병원에 가지 못했을 때, 오늘 진료 내용을 쉽게 물어볼 수 있어요.</p>
-      <div class="row">
-        <button type="button" class="bigbtn" id="btnAiOpen">💬 진료 내용 AI에게 물어보기</button>
-      </div>
-      <p class="smallnote">시연용 자동응답입니다. 실제 진료기록 연동 전이며, 정확한 내용은 병원에 확인해 주세요. 입력 내용은 이 기기 화면에만 표시됩니다.</p>
     </div>
     <div class="card">
       <h2>보호자 실시간 위치</h2>
@@ -238,34 +221,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sa
   </div>
 </div>
 
-<!-- 진료내용 AI 채팅 (보호자용, 시연용 자동응답) -->
-<div class="modal" id="aiModal" aria-hidden="true">
-  <div class="sheet">
-    <h3>💬 진료 내용 물어보기</h3>
-    <p class="smallnote" id="aiNow">오늘 진료 내용을 쉽게 설명해 드려요.</p>
-    <div class="aimsgs" id="aiMsgs" aria-live="polite"></div>
-    <div class="aichips">
-      <button type="button" data-aiq="오늘 진료 내용 요약해줘">오늘 진료 요약</button>
-      <button type="button" data-aiq="처방이랑 약 먹는 법 알려줘">처방·복약 안내</button>
-      <button type="button" data-aiq="다음 예약 언제야?">다음 예약</button>
-      <button type="button" data-aiq="지금 차량 어디야?">차량 위치</button>
-    </div>
-    <div class="aiinputrow">
-      <input type="text" id="aiInput" maxlength="200" placeholder="예: 진료 결과가 어떻게 됐어?" aria-label="AI에게 질문 입력">
-      <button type="button" id="btnAiSend">보내기</button>
-    </div>
-    <p class="smallnote">입력하신 질문은 이 기기 브라우저에만 표시되고 서버로 전송되지 않습니다.</p>
-    <div class="row" style="margin-top:8px">
-      <button type="button" class="ghostbtn" id="btnAiClose">닫기</button>
-    </div>
-  </div>
-</div>
-
 <!-- PIN / 관리자 -->
 <div class="modal" id="pinModal" aria-hidden="true">
   <div class="sheet"><h3>관리자 PIN</h3>
     <label for="pinInput">PIN 4자리</label>
-    <input type="text" inputmode="numeric" id="pinInput" placeholder="1234 (시제품 예시)" maxlength="4" autocomplete="off">
+    <input type="text" inputmode="numeric" id="pinInput" placeholder="1234 (시제품 예시)">
     <p class="smallnote" id="pinMsg"></p>
     <div class="row"><button type="button" class="bigbtn" id="btnPinOk">확인</button><button type="button" class="ghostbtn" id="btnPinX">닫기</button></div>
   </div>
@@ -325,11 +285,10 @@ var map1=null,map2=null,carMk1=null,carMk2=null,gpsMk1=null,gpsMk2=null,gpsTrail
 var gpsWatch=null,gpsOn=false,simP=null,simTimer=null;
 var TILE_URLS=["https://tile.openstreetmap.org/{z}/{x}/{y}.png","https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png","https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"];
 function fallbackSVG(el,label){el.innerHTML='<svg viewBox="0 0 400 320" role="img" aria-label="약도"><rect width="400" height="320" fill="#FFF6D9"/><path d="M40 260 L140 200 L220 170 L300 110" stroke="#E5B800" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="40" cy="260" r="12" fill="#2E7D32"/><text x="40" y="290" font-size="14" text-anchor="middle">집</text><circle cx="300" cy="110" r="12" fill="#C62828"/><text x="300" y="90" font-size="14" text-anchor="middle">병원</text><text x="170" y="150" font-size="30">♿</text><text x="200" y="300" font-size="12" fill="#7A6A45">'+esc(label||"인터넷이 막히면 약도로 표시됩니다")+'</text></svg>';}
-var _leafletOK=false;
-function loadLeaflet(cb){if(window.L&&window.L.map){_leafletOK=true;cb(true);return;}if(!document.querySelector('link[data-leaflet-css]')){var css=document.createElement("link");css.rel="stylesheet";css.setAttribute("data-leaflet-css","1");css.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";css.onerror=function(){};document.head.appendChild(css);}
-  var seq=["https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js","https://unpkg.com/leaflet@1.9.4/dist/leaflet.js","https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"];var i=0;var finished=false;
-  function done(ok){if(finished)return;finished=true;if(ok)_leafletOK=true;cb(ok);}
-  function nxt(){if(finished)return;if(window.L&&window.L.map){done(true);return;}if(i>=seq.length){done(false);return;}var s=document.createElement("script");s.src=seq[i++];s.onload=function(){if(window.L&&window.L.map)done(true);else nxt();};s.onerror=nxt;document.head.appendChild(s);setTimeout(function(){if(!finished&&(window.L&&window.L.map))done(true);},6000);}nxt();}
+var _leafletDone=false;
+function loadLeaflet(cb){function done(ok){if(_leafletDone)return;_leafletDone=true;cb(ok);}if(window.L&&window.L.map){done(true);return;}if(!document.querySelector('link[data-leaflet-css]')){var css=document.createElement("link");css.rel="stylesheet";css.setAttribute("data-leaflet-css","1");css.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";css.onerror=function(){};document.head.appendChild(css);}
+  var seq=["https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js","https://unpkg.com/leaflet@1.9.4/dist/leaflet.js","https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"];var i=0;
+  function nxt(){if(_leafletDone)return;if(i>=seq.length){done(false);return;}var s=document.createElement("script");s.src=seq[i++];s.onload=function(){done(!!(window.L&&window.L.map));if(!window.L||!window.L.map)nxt();};s.onerror=nxt;document.head.appendChild(s);setTimeout(function(){if(!_leafletDone&&(window.L&&window.L.map))done(true);},4000);}nxt();}
 function routePos(p){if(p<=0)return ROUTE_LL[0];if(p>=1)return ROUTE_LL[ROUTE_LL.length-1];var seg=(ROUTE_LL.length-1)*p;var k=Math.floor(seg);var f=seg-k;var a=ROUTE_LL[k],b=ROUTE_LL[k+1];return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];}
 function curP(){if(simP!=null)return simP;var base=[0.06,0.18,0.30,0.55,0.80,0.97];return base[Math.min(S.stage,base.length-1)]||0.3;}
 function updateCarOnMaps(){var p=curP();var pos=routePos(p);
@@ -346,7 +305,7 @@ function buildRealMaps(){var e1=$("realMap"),e2=$("realMapG");if(!window.L||!win
 function refreshMapSize(){try{if(map1){map1.invalidateSize();map1.fitBounds([HOME_LL,HOSP_LL],{padding:[20,20]});}}catch(e){}try{if(map2){map2.invalidateSize();map2.fitBounds([HOME_LL,HOSP_LL],{padding:[20,20]});}}catch(e){}updateCarOnMaps();}
 function ensureMaps(){loadLeaflet(function(ok){buildRealMaps();setTimeout(refreshMapSize,600);if(!ok)toast("인터넷이 막혀 약도로 표시됩니다. 실제지도는 게시 주소에서 확인해 주세요.");});}
 function startGps(){var g1=$("gpsStat1"),g2=$("gpsStat2");
-  if(gpsOn||gpsWatch!=null){try{if(gpsWatch!=null)navigator.geolocation.clearWatch(gpsWatch);}catch(e){}gpsWatch=null;gpsOn=false;var a=$("btnGps1");if(a)a.textContent="📍 내 위치 보기 (GPS)";var b=$("btnGps2");if(b)b.textContent="📍 내 위치 보기 (GPS)";toast("GPS 추적을 멈췄어요.");return;}
+  if(gpsOn){try{if(gpsWatch!=null)navigator.geolocation.clearWatch(gpsWatch);}catch(e){}gpsWatch=null;gpsOn=false;var a=$("btnGps1");if(a)a.textContent="📍 내 위치 보기 (GPS)";var b=$("btnGps2");if(b)b.textContent="📍 내 위치 보기 (GPS)";toast("GPS 추적을 멈췄어요.");return;}
   if(!navigator.geolocation){toast("이 기기에서는 GPS를 사용할 수 없어요.");return;}
   toast("GPS를 켜는 중입니다. 위치 허용을 눌러주세요.");
   try{gpsWatch=navigator.geolocation.watchPosition(function(pos){gpsOn=true;var la=pos.coords.latitude,lo=pos.coords.longitude;var ac=Math.round(pos.coords.accuracy||0);var sp=pos.coords.speed?Math.round(pos.coords.speed*3.6):0;
@@ -355,14 +314,14 @@ function startGps(){var g1=$("gpsStat1"),g2=$("gpsStat2");
     var a=$("btnGps1");if(a)a.textContent="⏸ GPS 추적 정지";var bb=$("btnGps2");if(bb)bb.textContent="⏸ GPS 추적 정지";
     try{if(map1){if(!gpsMk1)gpsMk1=L.circleMarker([la,lo],{radius:8,color:"#1565C0"}).addTo(map1);else gpsMk1.setLatLng([la,lo]);if(S.tab==="move")map1.panTo([la,lo]);}}catch(e){}
     try{if(map2){if(!gpsMk2)gpsMk2=L.circleMarker([la,lo],{radius:8,color:"#1565C0"}).addTo(map2);else gpsMk2.setLatLng([la,lo]);if(S.tab==="guardian")map2.panTo([la,lo]);}}catch(e){}
-  },function(){try{if(gpsWatch!=null)navigator.geolocation.clearWatch(gpsWatch);}catch(e){}gpsWatch=null;gpsOn=false;var _a=$("btnGps1");if(_a)_a.textContent="📍 내 위치 보기 (GPS)";var _b=$("btnGps2");if(_b)_b.textContent="📍 내 위치 보기 (GPS)";toast("위치를 가져오지 못했어요. 위치 허용을 확인해 주세요.");},{enableHighAccuracy:true,maximumAge:2000,timeout:10000});}catch(err){gpsWatch=null;gpsOn=false;toast("GPS를 시작하지 못했어요.");}}
+  },function(){toast("위치를 가져오지 못했어요. 위치 허용을 확인해 주세요.");},{enableHighAccuracy:true,maximumAge:2000,timeout:10000});}catch(err){toast("GPS를 시작하지 못했어요.");}}
 function stepSim(){if(simP==null)simP=0.06;simP=Math.min(1,simP+0.03);updateCarOnMaps();updateSimUI();if(simP>=1){stopSim();toast("병원에 도착했어요.");pushNotif("병원에 도착했어요","충남대병원 · 보호자에게 공유되었습니다");}}
 function updateSimUI(){var r=simTimer!=null;var a=$("btnSim1");if(a)a.textContent=r?"⏸ 실시간 이동 정지":"🚐 실시간 이동 시작";var b=$("btnSim2");if(b)b.textContent=r?"⏸ 실시간 이동 정지":"🚐 실시간 이동 시작";}
 function startSim(){if(simTimer){stopSim();return;}if(simP==null||simP>=1)simP=0.06;simTimer=setInterval(stepSim,1000);updateSimUI();toast("실시간 이동을 시작합니다. 차량(♿)이 움직입니다.");}
 function stopSim(){if(simTimer)clearInterval(simTimer);simTimer=null;updateSimUI();updateCarOnMaps();}
 
 /* 예약 모달 */
-function openAppt(){renderAppt();var d=$("apptDate");try{var _t=new Date();var _ty=_t.getFullYear()+"-"+String(_t.getMonth()+1).padStart(2,"0")+"-"+String(_t.getDate()).padStart(2,"0");if(d)d.min=_ty;}catch(e){}if(d&&!d.value)d.value=S.appt.date;var t=$("apptTime");if(t&&S.appt.time)t.value=S.appt.time;var p=$("apptDept");if(p&&S.appt.dept)p.value=S.appt.dept;$("apptMsg").textContent="";$("cancelRow").style.display="none";$("apptModal").classList.add("open");}
+function openAppt(){renderAppt();var d=$("apptDate");if(d&&!d.value)d.value=S.appt.date;var t=$("apptTime");if(t&&S.appt.time)t.value=S.appt.time;var p=$("apptDept");if(p&&S.appt.dept)p.value=S.appt.dept;$("apptMsg").textContent="";$("cancelRow").style.display="none";$("apptModal").classList.add("open");}
 function closeAppt(){$("apptModal").classList.remove("open");}
 var _apptBusy=false;
 function saveAppt(){if(_apptBusy)return;var d=$("apptDate").value,t=$("apptTime").value,dep=$("apptDept").value;var m=$("apptMsg");
@@ -373,23 +332,6 @@ function saveAppt(){if(_apptBusy)return;var d=$("apptDate").value,t=$("apptTime"
   S.appt={date:d,time:t,dept:dep,off:"충남대병원",canceled:false};saveState();renderAppt();pushNotif("진료시간이 변경되었어요","충남대병원 "+d+" "+t+" "+dep);toast("진료시간이 변경되었어요.");closeAppt();
   setTimeout(function(){_apptBusy=false;b.disabled=false;},800);}
 
-/* 진료내용 AI 채팅 (보호자용 · 서버 없이 동작하는 시연용 자동응답) */
-function aiSummaryText(){var a=S.appt;if(a.canceled)return "오늘 예약은 보호자가 취소한 상태예요. 다시 변경하면 예약을 살릴 수 있어요.";return "오늘 일정은 "+a.off+" "+a.date+" "+a.time+" "+a.dept+" 진료예요. 둔산동 집에서 휠체어 차량으로 이동합니다.";}
-function aiDemoResult(){var a=S.appt;return "[시연용 요약 · 실제 기록 아님]\n"+"· 병원: "+a.off+" / "+a.dept+"\n"+"· 날짜·시간: "+a.date+" "+a.time+"\n"+"· 의사 소견(예시): 경과가 안정적이라 통원 치료를 유지하고, 무리한 계단 이용은 피해주세요.\n"+"· 처방(예시): 처방전이 있으면 약국에서 수령 후 1일 2회 식후 복용해 주세요.\n"+"정확한 진료 내용·처방은 병원 원무과 / 처방전으로 꼭 확인해 주세요.";}
-function aiAnswer(q){q=String(q||"");var s=q.replace(/\s+/g,"");
-  if(/취소/.test(s))return S.appt.canceled?"네, 오늘 예약은 취소된 상태예요. 보호자 화면의 [진료시간 변경 / 취소]에서 다시 변경하면 예약을 살릴 수 있어요.":"오늘 예약은 유지 중이에요. 취소하려면 보호자 화면의 [진료시간 변경 / 취소] → [진료 취소하기]를 눌러주세요.";
-  if(/다음예약|다음진료|언제|몇시|시간|날짜|일정/.test(s))return aiSummaryText()+" 변경은 보호자 화면의 [진료시간 변경 / 취소]에서 할 수 있어요.";
-  if(/차량|위치|어디|왔어|도착|기사/.test(s)){var pc=Math.round(curP()*100);return "휠체어 차량은 둔산동 집 → 충남대병원 경로의 약 "+pc+"% 지점에 있어요. 이동 탭의 [🚐 실시간 이동 시작]을 누르면 지도에서 직접 움직이는 모습을 볼 수 있어요. 급하면 [기사님께 전화하기]를 이용해 주세요.";}
-  if(/처방|약|복용|먹는|부작용|주의/.test(s))return "[시연용 복약 안내 · 실제 처방 아님]\n· 처방전이 있으면 약국에서 먼저 수령해 주세요.\n· 예시 복용법: 1일 2회, 아침·저녁 식후 30분, 물과 함께 복용\n· 어지럼·속쓰림이 있으면 복용을 멈추고 병원에 문의해 주세요.\n정확한 용법은 처방전·약사 안내가 우선입니다.";
-  if(/결과|요약|소견|진료내용|어땠|어떻게|의사|진단|설명/.test(s))return aiDemoResult();
-  if(/준비|챙길|가져갈|서류|신분증/.test(s))return "병원 갈 때 챙길 것: 신분증, 진료카드(있으면), 처방전·복용 중인 약, 보호자 연락처예요. 휠체어 차량이라 계단 걱정 없이 집 앞에서 탑승합니다.";
-  if(/안녕|고마|감사|잘가/.test(s))return "네, 보호자님. 진료 관련해서 더 궁금한 점이 있으면 편하게 물어봐 주세요.";
-  return "질문을 이해했어요. 이렇게 물어봐 주세요.\n· \"오늘 진료 내용 요약해줘\"\n· \"처방이랑 약 먹는 법 알려줘\"\n· \"다음 예약 언제야?\"\n· \"지금 차량 어디야?\"";}
-function aiAddMsg(who,text){var w=$("aiMsgs");if(!w)return;var d=document.createElement("div");d.className="aimsg "+(who==="me"?"me":"ai");d.textContent=text;w.appendChild(d);w.scrollTop=w.scrollHeight;}
-function aiAsk(q){q=String(q==null?"":q).trim().slice(0,200);if(!q){toast("질문을 입력해 주세요.");return;}aiAddMsg("me",q);var a=null;try{a=aiAnswer(q);}catch(e){a="답변을 만들지 못했어요. 잠시 후 다시 물어봐 주세요.";}aiAddMsg("ai",a);var inp=$("aiInput");if(inp)inp.value="";}
-function openAi(){var m=$("aiModal");if(!m)return;var n=$("aiNow");if(n){try{n.textContent=aiSummaryText();}catch(e){}}var w=$("aiMsgs");if(w&&!w.childNodes.length){aiAddMsg("ai","안녕하세요, 보호자님. 함께 병원에 가지 못했을 때 진료 내용을 쉽게 설명해 드릴게요. 아래 버튼을 누르거나 직접 질문해 보세요.");}m.classList.add("open");setTimeout(function(){try{var i=$("aiInput");if(i&&window.innerWidth>480)i.focus();}catch(e){}},100);}
-function closeAi(){var m=$("aiModal");if(m)m.classList.remove("open");}
-
 /* 관리자 */
 var tapN=0,tapT=0;
 function openPin(){$("pinModal").classList.add("open");$("pinMsg").textContent="";}
@@ -398,7 +340,7 @@ function render(){renderAppt();renderNotifs();renderFb();renderPts();updateCarOn
 /* 바인딩 */
 function bindAll(){
   document.querySelectorAll("[data-tab]").forEach(function(b){b.addEventListener("click",function(){setTab(b.getAttribute("data-tab"))});});
-  document.querySelectorAll("[data-fb]").forEach(function(b){b.setAttribute("aria-pressed","false");b.addEventListener("click",function(){window._mood=b.getAttribute("data-fb");var _all=document.querySelectorAll("[data-fb]");for(var _k=0;_k<_all.length;_k++){_all[_k].classList.remove("sel");_all[_k].setAttribute("aria-pressed","false");}b.classList.add("sel");b.setAttribute("aria-pressed","true");toast("기분 "+window._mood+" 선택됨");});});
+  document.querySelectorAll("[data-fb]").forEach(function(b){b.addEventListener("click",function(){window._mood=b.getAttribute("data-fb");toast("기분 "+window._mood+" 선택됨");});});
   safeBind("btnGps1",startGps);safeBind("btnGps2",startGps);
   safeBind("btnReal1",function(){toast("실제지도를 불러오는 중입니다.");ensureMaps();setTimeout(refreshMapSize,800);});
   safeBind("btnReal2",function(){toast("실제지도를 불러오는 중입니다.");ensureMaps();setTimeout(refreshMapSize,800);});
@@ -412,11 +354,6 @@ function bindAll(){
   safeBind("btnApptSave",saveAppt);
   safeBind("btnApptCancel",function(){$("cancelRow").style.display="flex";$("apptMsg").textContent="정말 취소할까요? 아래에서 다시 한 번 눌러주세요.";});
   safeBind("btnApptNo",function(){$("cancelRow").style.display="none";$("apptMsg").textContent="";});
-  safeBind("btnAiOpen",openAi);safeBind("btnAiClose",closeAi);
-  safeBind("btnAiSend",function(){var i=$("aiInput");aiAsk(i?i.value:"");});
-  document.querySelectorAll("[data-aiq]").forEach(function(b){b.addEventListener("click",function(){aiAsk(b.getAttribute("data-aiq"));});});
-  var _aiInp=$("aiInput");if(_aiInp)_aiInp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();aiAsk(_aiInp.value);}});
-  var _aiM=$("aiModal");if(_aiM)_aiM.addEventListener("click",function(e){if(e.target===_aiM)closeAi();});
   var _cancelBusy=false;
   safeBind("btnApptYes",function(){if(_cancelBusy)return;if(S.appt.canceled){toast("이미 취소된 예약이에요.");closeAppt();return;}_cancelBusy=true;var _cb=$("btnApptYes");if(_cb)_cb.disabled=true;S.appt.canceled=true;saveState();renderAppt();pushNotif("진료 예약이 취소되었어요","보호자가 취소함 · 다시 변경하면 예약을 살릴 수 있어요");toast("예약이 취소되었어요.");closeAppt();setTimeout(function(){_cancelBusy=false;if(_cb)_cb.disabled=false;},800);});
   var _fbBusy=false,lastFb="",lastT=0;
@@ -424,7 +361,7 @@ function bindAll(){
     var now=Date.now();if(tx===lastFb&&(now-lastT)<10000){toast("같은 의견이 방금 저장되었어요.");return;}
     _fbBusy=true;$("btnFb").disabled=true;
     try{var arr=JSON.parse(localStorage.getItem("gachiga_fb")||"[]");arr.unshift({mood:window._mood,text:tx,at:new Date().toLocaleString()});localStorage.setItem("gachiga_fb",JSON.stringify(arr.slice(0,30)));}catch(e){toast("저장에 실패했어요. 다시 눌러주세요.");_fbBusy=false;$("btnFb").disabled=false;return;}
-    lastFb=tx;lastT=now;$("fbText").value="";window._mood=null;var _al=document.querySelectorAll("[data-fb]");for(var _q=0;_q<_al.length;_q++){_al[_q].classList.remove("sel");_al[_q].setAttribute("aria-pressed","false");}renderFb();toast("의견이 저장되었어요.");setTimeout(function(){_fbBusy=false;$("btnFb").disabled=false;},800);});
+    lastFb=tx;lastT=now;$("fbText").value="";renderFb();toast("의견이 저장되었어요.");setTimeout(function(){_fbBusy=false;$("btnFb").disabled=false;},800);});
   safeBind("btnPinOk",function(){if($("pinInput").value==="1234"){$("pinModal").classList.remove("open");$("adminov").style.display="block";toast("관리자 화면입니다.");}else{$("pinMsg").textContent="PIN이 올바르지 않아요.";}});
   safeBind("btnPinX",function(){$("pinModal").classList.remove("open");});
   safeBind("btnAdmX",function(){$("adminov").style.display="none";});
